@@ -51,6 +51,23 @@ def test_history_earns_express(client):
     assert s["policy"] == "express"
 
 
+def test_demo_path_reaches_express(client):
+    # The video's order: first visit with an upheld "Not mine", then the trust page's 20 seeded visits.
+    s = client.post("/api/sessions/from-scenario", json={"scenario": "01-first-visit"}).json()
+    sid = s["session_id"]
+    s = client.post(f"/api/sessions/{sid}/authorize").json()
+    s = client.post(f"/api/sessions/{sid}/exit", json={"staff_verdicts": staff_all(s)}).json()
+    line = next(ln for ln in s["lines"] if ln["billed"])
+    client.post(f"/api/sessions/{sid}/lines/{line['line_id']}/not-mine", json={"footage_shows_take": False})
+    client.post("/api/demo/seed-history", json={"customer_id": "asha", "visits": 20, "basket_inr": 200})
+    s = client.post("/api/sessions/from-scenario", json={"scenario": "02-regular-visit"}).json()
+    assert s["policy"] == "express"
+    sid = s["session_id"]
+    client.post(f"/api/sessions/{sid}/authorize")
+    s = client.post(f"/api/sessions/{sid}/exit", json={}).json()
+    assert s["status"] == "captured" and s["captured_amount"] == s["authorized_amount"]
+
+
 def test_large_basket_steps_up_and_finds_hidden_item(client):
     client.post("/api/demo/seed-history", json={"customer_id": "ravi", "visits": 30, "basket_inr": 200})
     s = client.post("/api/sessions/from-scenario", json={"scenario": "03-large-basket"}).json()

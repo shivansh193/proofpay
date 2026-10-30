@@ -26,8 +26,8 @@ export default function TrustPage() {
 
   const seed = async () => {
     try {
-      const r = await api<Trust>("/api/demo/seed-history", { customer_id: seedFor, visits: 12, basket_inr: 200 });
-      setMsg(`Added 12 simulated weekly visits for ${seedFor}.`);
+      const r = await api<Trust>("/api/demo/seed-history", { customer_id: seedFor, visits: 20, basket_inr: 200 });
+      setMsg(`Added 20 simulated weekly visits for ${seedFor}.`);
       await loadSubjects();
       setPick(r.subject);
     } catch (e) { setMsg(String(e)); }

@@ -168,6 +168,20 @@ Results for seed 0 ([full table](docs/eval/results.md)):
 
 The default stays at 0.3 until it is chosen deliberately. It is a product decision, not something to tune for a nicer chart.
 
+## Built during the hackathon
+
+Proofpay is a new project. No code predates the submission period, and the history starts at `ed88ea0` (2026-10-30):
+
+| Commits | What |
+|---|---|
+| `ed88ea0` | Trust engine, unit tests, population simulator |
+| `27b26a5` | PayPal client and offline stand-in, checkout service, API, vision replay, AI advisor, agent guard |
+| `3cdc254` onward | Web app, Render deploy, docs |
+
+Third-party code is limited to the dependencies in `pyproject.toml` and `web/package.json`.
+
+The submission text is in [docs/devpost.md](docs/devpost.md), and the demo video script is in [docs/video-script.md](docs/video-script.md).
+
 ## Repository layout
 
 ```
