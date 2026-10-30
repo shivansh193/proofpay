@@ -1,0 +1,9 @@
+[
+  {"sku": "SUP-BAG-100", "name": "Paper bags (100)", "price": 350, "default_qty": 2},
+  {"sku": "SUP-RCPT-10", "name": "Receipt rolls (10)", "price": 220, "default_qty": 1},
+  {"sku": "SUP-CLEAN-5L", "name": "Floor cleaner 5 L", "price": 480, "default_qty": 1},
+  {"sku": "SUP-GLOVE-50", "name": "Nitrile gloves (50 pairs)", "price": 560, "default_qty": 0},
+  {"sku": "SUP-LABEL-500", "name": "Shelf price labels (500)", "price": 300, "default_qty": 0},
+  {"sku": "SUP-BULB-4", "name": "LED tube lights (4)", "price": 1200, "default_qty": 0},
+  {"sku": "SUP-FRIDGE", "name": "Display fridge, 2-door", "price": 48000, "default_qty": 0}
+]

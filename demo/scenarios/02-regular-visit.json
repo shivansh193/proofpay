@@ -1,0 +1,14 @@
+{
+  "title": "Regular visit: same shopper after weeks of verified visits",
+  "customer_id": "asha",
+  "clip": null,
+  "detections": [
+    {"item_id": "l1", "name": "Amul milk 1 L", "sku": "MILK-1L", "price": 68, "p_taken": 0.997,
+     "events": [{"t": 3.0, "type": "pick", "conf": 0.99}], "notes": "Clear view."},
+    {"item_id": "l2", "name": "Eggs (6)", "sku": "EGG-6", "price": 48, "p_taken": 0.995,
+     "events": [{"t": 7.5, "type": "pick", "conf": 0.99}], "notes": "Clear view."},
+    {"item_id": "l3", "name": "Bananas (6)", "sku": "BAN-6", "price": 40, "p_taken": 0.993,
+     "events": [{"t": 12.2, "type": "pick", "conf": 0.98}], "notes": "Clear view."}
+  ],
+  "hidden": []
+}

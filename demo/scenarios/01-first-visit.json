@@ -1,0 +1,18 @@
+{
+  "title": "First visit: new shopper, one occluded item, one put back",
+  "customer_id": "asha",
+  "clip": null,
+  "detections": [
+    {"item_id": "l1", "name": "Amul milk 1 L", "sku": "MILK-1L", "price": 68, "p_taken": 0.996,
+     "events": [{"t": 4.1, "type": "pick", "conf": 0.99}], "notes": "Clear view, item in hand to exit."},
+    {"item_id": "l2", "name": "Brown bread", "sku": "BREAD-BRN", "price": 55, "p_taken": 0.992,
+     "events": [{"t": 9.8, "type": "pick", "conf": 0.98}], "notes": "Clear view."},
+    {"item_id": "l3", "name": "Dark chocolate 100 g", "sku": "CHOC-DK-100", "price": 180, "p_taken": 0.63,
+     "events": [{"t": 15.2, "type": "pick", "conf": 0.81}, {"t": 21.0, "type": "occluded", "conf": 0.5}],
+     "notes": "Picked up, then hand blocked by basket; no put-back seen."},
+    {"item_id": "l4", "name": "Shampoo 340 ml", "sku": "SHAMP-340", "price": 299, "p_taken": 0.11,
+     "events": [{"t": 26.4, "type": "pick", "conf": 0.95}, {"t": 31.7, "type": "put_back", "conf": 0.93}],
+     "notes": "Picked up and returned to the same shelf slot."}
+  ],
+  "hidden": []
+}

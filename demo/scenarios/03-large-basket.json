@@ -1,0 +1,20 @@
+{
+  "title": "Large basket far above this shopper's usual, one item hidden from cameras",
+  "customer_id": "ravi",
+  "clip": null,
+  "detections": [
+    {"item_id": "l1", "name": "Olive oil 1 L", "sku": "OIL-OLV-1L", "price": 899, "p_taken": 0.995,
+     "events": [{"t": 5.0, "type": "pick", "conf": 0.99}], "notes": "Clear view."},
+    {"item_id": "l2", "name": "Basmati rice 5 kg", "sku": "RICE-5KG", "price": 760, "p_taken": 0.994,
+     "events": [{"t": 11.0, "type": "pick", "conf": 0.99}], "notes": "Clear view."},
+    {"item_id": "l3", "name": "Almonds 500 g", "sku": "ALM-500", "price": 640, "p_taken": 0.97,
+     "events": [{"t": 18.3, "type": "pick", "conf": 0.97}], "notes": "Partly occluded by trolley."},
+    {"item_id": "l4", "name": "Coffee 200 g", "sku": "COF-200", "price": 520, "p_taken": 0.58,
+     "events": [{"t": 24.9, "type": "pick", "conf": 0.88}, {"t": 27.1, "type": "occluded", "conf": 0.4}],
+     "notes": "Picked up near a blind spot; no put-back seen."}
+  ],
+  "hidden": [
+    {"item_id": "x1", "name": "Saffron 1 g", "sku": "SAFF-1G", "price": 350, "p_taken": 0.0,
+     "notes": "Not seen by cameras; found by staff in a jacket pocket at the exit check."}
+  ]
+}
