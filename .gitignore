@@ -10,3 +10,8 @@ node_modules/
 .next/
 web/out/
 *.tsbuildinfo
+# media outputs (music licence is the bundler's, not ours to redistribute)
+brag-output/**/*.mp3
+brag-output/composition/.hyperframes/
+tools/recorder/out/
+brag-output/brag.mp4

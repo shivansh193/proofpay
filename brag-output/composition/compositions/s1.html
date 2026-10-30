@@ -1,0 +1,61 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      color: var(--ink);
+    }
+    .s1-row {
+      display: grid;
+      grid-template-columns: 360px 520px;
+      align-items: baseline;
+      column-gap: 40px;
+    }
+    .s1-label {
+      font-size: 52px;
+      font-weight: 400;
+      color: var(--muted);
+      text-align: right;
+    }
+    .s1-amount {
+      font-size: 150px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+    #s1-held-amt {
+      color: var(--ink);
+    }
+    #s1-charged-amt {
+      color: var(--accent);
+    }
+    #s1-line {
+      margin-top: 48px;
+      font-size: 44px;
+      font-weight: 400;
+      color: var(--muted);
+    }
+  </style>
+  <div id="root" data-composition-id="s1" data-width="1920" data-height="1080">
+    <div id="s1-held" class="s1-row">
+      <span class="s1-label">Held</span><span id="s1-held-amt" class="s1-amount">$4.10</span>
+    </div>
+    <div id="s1-charged" class="s1-row">
+      <span class="s1-label">Charged</span><span id="s1-charged-amt" class="s1-amount">$3.57</span>
+    </div>
+    <p id="s1-line">Only what the camera proved.</p>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s1-charged", { opacity: 0, y: 30, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 1.5);
+    tl.fromTo("#s1-held-amt", { color: "#14171c" }, { color: "#9aa3ae", duration: 0.4, ease: "power2.inOut" }, 1.6);
+    tl.fromTo("#s1-line", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power4.out" }, 2.1);
+    tl.to(["#s1-held", "#s1-charged", "#s1-line"], { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power3.in", stagger: 0.05 }, 3.9);
+    window.__timelines["s1"] = tl;
+  </script>
+</template>

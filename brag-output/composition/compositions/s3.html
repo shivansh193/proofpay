@@ -1,0 +1,111 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      color: var(--ink);
+    }
+    #s3-card {
+      width: 900px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 44px 52px;
+      box-shadow: 0 18px 50px rgba(20, 23, 28, 0.08);
+    }
+    .s3-label {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .s3-main {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      margin-top: 14px;
+    }
+    #s3-score {
+      font-size: 150px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .s3-chips {
+      position: relative;
+      width: 220px;
+      height: 56px;
+    }
+    .s3-chip {
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 34px;
+      font-weight: 600;
+      padding: 6px 24px;
+      border-radius: 999px;
+    }
+    #s3-strict { color: var(--bad); background: var(--bad-bg); }
+    #s3-express { color: var(--good); background: var(--good-bg); }
+    .s3-bar {
+      margin-top: 30px;
+      height: 14px;
+      border-radius: 7px;
+      background: var(--chip);
+      overflow: hidden;
+    }
+    #s3-fill {
+      height: 100%;
+      width: 100%;
+      background: var(--accent);
+      transform-origin: left center;
+    }
+    .s3-sub {
+      margin-top: 14px;
+      font-size: 28px;
+      color: var(--muted);
+    }
+    #s3-line {
+      margin-top: 44px;
+      font-size: 44px;
+      color: var(--ink);
+    }
+  </style>
+  <div id="root" data-composition-id="s3" data-width="1920" data-height="1080">
+    <div id="s3-card">
+      <div class="s3-label">Shopper trust · asha</div>
+      <div class="s3-main">
+        <span id="s3-score">0.32</span>
+        <span class="s3-chips" data-layout-allow-overlap><span id="s3-strict" class="s3-chip">strict</span><span id="s3-express" class="s3-chip">express</span></span>
+      </div>
+      <div class="s3-bar"><div id="s3-fill"></div></div>
+      <div class="s3-sub">10th-percentile lower bound, used for decisions</div>
+    </div>
+    <p id="s3-line">Twenty verified visits later: no exit check.</p>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const score = { v: 0.32 };
+    const el = document.getElementById("s3-score");
+    tl.fromTo("#s3-card", { opacity: 0, y: 40, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0.1);
+    tl.fromTo("#s3-fill", { scaleX: 0.32 }, { scaleX: 0.32, duration: 0.01 }, 0);
+    tl.fromTo("#s3-line", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power4.out" }, 0.6);
+    tl.fromTo(score, { v: 0.32 }, {
+      v: 0.85, duration: 1.2, ease: "power2.inOut",
+      onUpdate: () => { el.textContent = score.v.toFixed(2); },
+    }, 0.6);
+    tl.to("#s3-fill", { scaleX: 0.85, duration: 1.2, ease: "power2.inOut" }, 0.6);
+    // strict -> express at 12.6s abs (1.8 local)
+    tl.to("#s3-strict", { opacity: 0, filter: "blur(6px)", duration: 0.15, ease: "power3.in" }, 1.8);
+    tl.fromTo("#s3-express", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(1.4)" }, 1.85);
+    tl.to(["#s3-card", "#s3-line"], { opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 3.9);
+    window.__timelines["s3"] = tl;
+  </script>
+</template>

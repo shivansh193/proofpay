@@ -1,0 +1,130 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      color: var(--ink);
+    }
+    #s2-panel {
+      width: 1320px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 40px 48px 28px;
+      box-shadow: 0 18px 50px rgba(20, 23, 28, 0.08);
+    }
+    .s2-head {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+    .s2-head h2 {
+      font-size: 40px;
+      font-weight: 700;
+    }
+    .s2-head .s2-who {
+      font-size: 32px;
+      color: var(--muted);
+    }
+    .chip {
+      display: inline-block;
+      font-size: 28px;
+      font-weight: 600;
+      padding: 6px 18px;
+      border-radius: 999px;
+    }
+    .c-good { color: var(--good); background: var(--good-bg); }
+    .c-warn { color: var(--warn); background: var(--warn-bg); }
+    .c-bad { color: var(--bad); background: var(--bad-bg); }
+    .c-muted { color: var(--muted); background: var(--chip); }
+    .s2-cols,
+    .s2-row {
+      display: grid;
+      grid-template-columns: 1fr 150px 260px 380px;
+      align-items: center;
+      column-gap: 24px;
+    }
+    .s2-cols {
+      font-size: 28px;
+      color: var(--muted);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .s2-row {
+      font-size: 34px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .s2-row:last-child { border-bottom: 0; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .s2-exit { display: flex; align-items: center; gap: 16px; }
+    #s2-taken {
+      font-size: 28px;
+      font-weight: 600;
+      padding: 6px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: var(--panel);
+    }
+    #s2-cursor {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 34px;
+      height: 34px;
+      z-index: 5;
+    }
+    #s2-pill {
+      margin-top: 36px;
+      font-family: var(--font-mono);
+      font-size: 32px;
+      padding: 16px 30px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: #ffffff;
+    }
+    #s2-pill b { color: #8ab4f8; font-weight: 700; }
+  </style>
+  <div id="root" data-composition-id="s2" data-width="1920" data-height="1080">
+    <div id="s2-panel">
+      <div class="s2-head">
+        <h2>First visit</h2>
+        <span class="s2-who">asha · no history</span>
+        <span class="chip c-bad">strict</span>
+      </div>
+      <div class="s2-cols"><span>Item</span><span class="num">Price</span><span class="num">Camera: taken?</span><span>At exit</span></div>
+      <div id="s2-r1" class="s2-row"><span>Amul milk 1 L</span><span class="num">₹68</span><span class="num">99.6%</span><span><span class="chip c-good">Auto-capture</span></span></div>
+      <div id="s2-r2" class="s2-row"><span>Brown bread</span><span class="num">₹55</span><span class="num">99.2%</span><span><span class="chip c-good">Auto-capture</span></span></div>
+      <div id="s2-r3" class="s2-row"><span>Dark chocolate 100 g</span><span class="num">₹180</span><span class="num">63%</span>
+        <span class="s2-exit"><span class="chip c-warn">Staff check</span><span id="s2-taken">Taken</span></span></div>
+      <div id="s2-r4" class="s2-row"><span>Shampoo 340 ml</span><span class="num">₹299</span><span class="num">11%</span><span><span class="chip c-muted">Released</span></span></div>
+    </div>
+    <div id="s2-pill">PayPal captures <b>$3.57</b></div>
+    <svg id="s2-cursor" viewBox="0 0 24 24"><path d="M3 2l7 19 2.5-7.5L20 11z" fill="#14171c" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round" /></svg>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s2-panel", { opacity: 0, y: 40, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0.1);
+    // beat-grid (every other beat, rows are read): 4.91, 6.00, 7.09, 8.19 abs -> 0.71, 1.80, 2.89, 3.99 local
+    ["#s2-r1", "#s2-r2", "#s2-r3", "#s2-r4"].forEach((r, i) => {
+      tl.fromTo(r, { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.35, ease: "power4.out" }, [0.71, 1.8, 2.89, 3.99][i]);
+    });
+    tl.fromTo("#s2-taken", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 3.1);
+    // Cursor travels to "Taken"; the click lands on the 8.74s beat (4.54 local).
+    tl.fromTo("#s2-cursor", { opacity: 0, x: 1500, y: 980 }, { opacity: 1, x: 1500, y: 980, duration: 0.2 }, 3.7);
+    tl.to("#s2-cursor", { x: 1452, y: 586, duration: 0.6, ease: "power3.inOut" }, 3.9);
+    tl.to("#s2-taken", { color: "#137a3c", backgroundColor: "#e6f4ea", borderColor: "#e6f4ea", duration: 0.15 }, 4.54);
+    tl.to("#s2-cursor", { scale: 0.85, duration: 0.08, yoyo: true, repeat: 1 }, 4.5);
+    tl.to("#s2-cursor", { opacity: 0, duration: 0.2 }, 5.0);
+    tl.fromTo("#s2-pill", { opacity: 0, y: 20, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.4, ease: "expo.out" }, 4.62);
+    tl.to(["#s2-panel", "#s2-pill"], { opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 6.36);
+    window.__timelines["s2"] = tl;
+  </script>
+</template>

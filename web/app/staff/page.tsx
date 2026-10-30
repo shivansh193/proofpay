@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { PolicyCosts, TrustCard } from "@/components/Decision";
@@ -88,6 +89,9 @@ function Staff() {
               <span className={`chip ${s.policy}`}>{s.policy}</span>
               <span className={`chip ${s.status}`}>{s.status}</span>
               <span className="spacer" />
+              {(s.status === "captured" || s.status === "voided") && (
+                <Link href={`/checkout/?s=${s.session_id}`}>Customer receipt</Link>
+              )}
               {s.status === "authorized" && toCheck.length > 0 && (
                 <button disabled={busy} onClick={() => run(async () => setRecs(await api<Rec[]>(`/api/sessions/${s.session_id}/explain`, {})))}>
                   Explain uncertain lines (AI)

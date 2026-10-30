@@ -2,13 +2,19 @@
 
 import { PayPalOneTimePaymentButton, PayPalProvider } from "@paypal/react-paypal-js/sdk-v6";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { PolicyCosts, TrustCard } from "@/components/Decision";
 import { api, DISPOSITION, inr, pct, type Config, type Session } from "@/lib/api";
 
 type Scenario = { scenario: string; title: string; customer_id: string };
 
-export default function Checkout() {
+export default function CheckoutPage() {
+  return <Suspense><Checkout /></Suspense>;
+}
+
+function Checkout() {
+  const params = useSearchParams();
   const [cfg, setCfg] = useState<Config | null>(null);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [pick, setPick] = useState("");
@@ -22,6 +28,12 @@ export default function Checkout() {
   }, []);
 
   const refresh = useCallback(async (id: string) => setS(await api<Session>(`/api/sessions/${id}`)), []);
+
+  // ?s=<id> reopens a visit, e.g. the receipt linked from the staff screen.
+  useEffect(() => {
+    const id = params.get("s");
+    if (id) refresh(id).catch((e) => setErr(String(e)));
+  }, [params, refresh]);
 
   // Wait for the staff exit check to close the session.
   useEffect(() => {
