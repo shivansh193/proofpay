@@ -1,0 +1,480 @@
+{
+ "seed": 0,
+ "world": {
+  "archetypes": {
+   "honest": 300,
+   "careless": 100,
+   "opportunistic": 60,
+   "fraudster": 40
+  },
+  "visits_per_subject": 30,
+  "mean_days_between_visits": 10.0,
+  "mean_items": 4.0,
+  "price_median": 120.0,
+  "price_sigma": 0.7,
+  "put_back_rate": 0.1,
+  "hard_case_rate": 0.08,
+  "taken_p": [
+   40.0,
+   1.0
+  ],
+  "hard_p": [
+   3.0,
+   2.0
+  ],
+  "put_back_p": [
+   1.0,
+   8.0
+  ],
+  "false_positive_rate": 0.04,
+  "conceal_prob": {
+   "honest": 0.0,
+   "careless": 0.05,
+   "opportunistic": 0.02,
+   "fraudster": 0.0
+  },
+  "notices_wrong_charge": {
+   "honest": 0.9,
+   "careless": 0.6,
+   "opportunistic": 0.95,
+   "fraudster": 0.95
+  },
+  "false_dispute_prob": {
+   "honest": 0.0,
+   "careless": 0.03,
+   "opportunistic": 0.12,
+   "fraudster": 0.0
+  },
+  "fraud_warmup_visits": [
+   5,
+   12
+  ],
+  "fraud_cashout_items": [
+   10,
+   20
+  ],
+  "fraud_conceal_share": 0.5,
+  "staff_accuracy": 0.98,
+  "footage_review_accuracy": 0.95
+ },
+ "results": [
+  {
+   "strategy": "proofpay",
+   "visits": 15000,
+   "loss_total": 337327.0,
+   "loss_per_visit": 22.488466666666667,
+   "staff_minutes": 17994.416666666668,
+   "staff_s_per_visit": 71.97766666666666,
+   "customer_wait_s_per_visit": 76.97766666666666,
+   "honest_sent_to_strict": 0.2823333333333333,
+   "honest_express_share": 0.1807777777777778,
+   "unrefunded_wrong_charges": 18,
+   "fraud_cashout_loss": 155982.0,
+   "fraudsters_caught": "40/40",
+   "fraud_median_visits_to_catch": 0.0,
+   "by_archetype": {
+    "careless": {
+     "loss_per_visit": 14.810333333333332,
+     "staff_s_per_visit": 72.64833333333333,
+     "strict_share": 0.6033333333333334,
+     "express_share": 0.08733333333333333
+    },
+    "fraudster": {
+     "loss_per_visit": 132.01,
+     "staff_s_per_visit": 185.88333333333333,
+     "strict_share": 0.8275,
+     "express_share": 0.056666666666666664
+    },
+    "honest": {
+     "loss_per_visit": 12.039777777777777,
+     "staff_s_per_visit": 54.62388888888889,
+     "strict_share": 0.2823333333333333,
+     "express_share": 0.1807777777777778
+    },
+    "opportunistic": {
+     "loss_per_visit": 14.514444444444445,
+     "staff_s_per_visit": 81.69166666666666,
+     "strict_share": 0.7744444444444445,
+     "express_share": 0.04722222222222222
+    }
+   }
+  },
+  {
+   "strategy": "beta_mean",
+   "visits": 15000,
+   "loss_total": 343202.0,
+   "loss_per_visit": 22.880133333333333,
+   "staff_minutes": 14092.333333333334,
+   "staff_s_per_visit": 56.36933333333333,
+   "customer_wait_s_per_visit": 61.36933333333333,
+   "honest_sent_to_strict": 0.07066666666666667,
+   "honest_express_share": 0.3858888888888889,
+   "unrefunded_wrong_charges": 24,
+   "fraud_cashout_loss": 171143.0,
+   "fraudsters_caught": "40/40",
+   "fraud_median_visits_to_catch": 0.0,
+   "by_archetype": {
+    "careless": {
+     "loss_per_visit": 15.672,
+     "staff_s_per_visit": 54.07,
+     "strict_share": 0.31466666666666665,
+     "express_share": 0.24033333333333334
+    },
+    "fraudster": {
+     "loss_per_visit": 144.56916666666666,
+     "staff_s_per_visit": 179.775,
+     "strict_share": 0.7441666666666666,
+     "express_share": 0.11333333333333333
+    },
+    "honest": {
+     "loss_per_visit": 10.856333333333334,
+     "staff_s_per_visit": 38.19777777777778,
+     "strict_share": 0.07066666666666667,
+     "express_share": 0.3858888888888889
+    },
+    "opportunistic": {
+     "loss_per_visit": 13.886666666666667,
+     "staff_s_per_visit": 68.78888888888889,
+     "strict_share": 0.545,
+     "express_share": 0.11777777777777777
+    }
+   }
+  },
+  {
+   "strategy": "static_rules",
+   "visits": 15000,
+   "loss_total": 631569.0,
+   "loss_per_visit": 42.1046,
+   "staff_minutes": 12255.083333333334,
+   "staff_s_per_visit": 49.02033333333333,
+   "customer_wait_s_per_visit": 54.02033333333333,
+   "honest_sent_to_strict": 0.0064444444444444445,
+   "honest_express_share": 0.711,
+   "unrefunded_wrong_charges": 24,
+   "fraud_cashout_loss": 175620.0,
+   "fraudsters_caught": "40/40",
+   "fraud_median_visits_to_catch": 0.0,
+   "by_archetype": {
+    "careless": {
+     "loss_per_visit": 31.464,
+     "staff_s_per_visit": 51.611666666666665,
+     "strict_share": 0.37366666666666665,
+     "express_share": 0.4086666666666667
+    },
+    "fraudster": {
+     "loss_per_visit": 150.66416666666666,
+     "staff_s_per_visit": 178.37916666666666,
+     "strict_share": 0.705,
+     "express_share": 0.09083333333333334
+    },
+    "honest": {
+     "loss_per_visit": 35.99188888888889,
+     "staff_s_per_visit": 25.447222222222223,
+     "strict_share": 0.0064444444444444445,
+     "express_share": 0.711
+    },
+    "opportunistic": {
+     "loss_per_visit": 18.029444444444444,
+     "staff_s_per_visit": 76.32777777777778,
+     "strict_share": 0.7216666666666667,
+     "express_share": 0.12222222222222222
+    }
+   }
+  },
+  {
+   "strategy": "no_trust",
+   "visits": 15000,
+   "loss_total": 754729.0,
+   "loss_per_visit": 50.315266666666666,
+   "staff_minutes": 13248.0,
+   "staff_s_per_visit": 52.992,
+   "customer_wait_s_per_visit": 57.992,
+   "honest_sent_to_strict": 0.0,
+   "honest_express_share": 0.0,
+   "unrefunded_wrong_charges": 19,
+   "fraud_cashout_loss": 581583.0,
+   "fraudsters_caught": "40/40",
+   "fraud_median_visits_to_catch": 0.0,
+   "by_archetype": {
+    "careless": {
+     "loss_per_visit": 14.645333333333333,
+     "staff_s_per_visit": 47.435,
+     "strict_share": 0.0,
+     "express_share": 0.0
+    },
+    "fraudster": {
+     "loss_per_visit": 486.6775,
+     "staff_s_per_visit": 116.475,
+     "strict_share": 0.0,
+     "express_share": 0.0
+    },
+    "honest": {
+     "loss_per_visit": 11.681333333333333,
+     "staff_s_per_visit": 47.61,
+     "strict_share": 0.0,
+     "express_share": 0.0
+    },
+    "opportunistic": {
+     "loss_per_visit": 12.026666666666667,
+     "staff_s_per_visit": 46.84166666666667,
+     "strict_share": 0.0,
+     "express_share": 0.0
+    }
+   }
+  }
+ ],
+ "quantile_sweep": [
+  {
+   "q": 0.02,
+   "strategy": "proofpay",
+   "visits": 15000,
+   "loss_total": 349122.0,
+   "loss_per_visit": 23.2748,
+   "staff_minutes": 21725.916666666668,
+   "staff_s_per_visit": 86.90366666666667,
+   "customer_wait_s_per_visit": 91.90366666666667,
+   "honest_sent_to_strict": 0.623,
+   "honest_express_share": 0.06755555555555555,
+   "unrefunded_wrong_charges": 14,
+   "fraud_cashout_loss": 155891.0,
+   "fraudsters_caught": "40/40",
+   "fraud_median_visits_to_catch": 0.0,
+   "by_archetype": {
+    "careless": {
+     "loss_per_visit": 14.859,
+     "staff_s_per_visit": 84.14333333333333,
+     "strict_share": 0.8136666666666666,
+     "express_share": 0.035
+    },
+    "fraudster": {
+     "loss_per_visit": 131.93416666666667,
+     "staff_s_per_visit": 189.34583333333333,
+     "strict_share": 0.8983333333333333,
+     "express_share": 0.03333333333333333
+    },
+    "honest": {
+     "loss_per_visit": 13.319111111111111,
+     "staff_s_per_visit": 74.2461111111111,
+     "strict_share": 0.623,
+     "express_share": 0.06755555555555555
+    },
+    "opportunistic": {
+     "loss_per_visit": 14.64,
+     "staff_s_per_visit": 86.49722222222222,
+     "strict_share": 0.8677777777777778,
+     "express_share": 0.028333333333333332
+    }
+   }
+  },
+  {
+   "q": 0.05,
+   "strategy": "proofpay",
+   "visits": 15000,
+   "loss_total": 342555.0,
+   "loss_per_visit": 22.837,
+   "staff_minutes": 19921.75,
+   "staff_s_per_visit": 79.687,
+   "customer_wait_s_per_visit": 84.687,
+   "honest_sent_to_strict": 0.45022222222222225,
+   "honest_express_share": 0.11544444444444445,
+   "unrefunded_wrong_charges": 14,
+   "fraud_cashout_loss": 155891.0,
+   "fraudsters_caught": "40/40",
+   "fraud_median_visits_to_catch": 0.0,
+   "by_archetype": {
+    "careless": {
+     "loss_per_visit": 14.518333333333333,
+     "staff_s_per_visit": 79.18666666666667,
+     "strict_share": 0.722,
+     "express_share": 0.05633333333333333
+    },
+    "fraudster": {
+     "loss_per_visit": 131.93416666666667,
+     "staff_s_per_visit": 187.775,
+     "strict_share": 0.8658333333333333,
+     "express_share": 0.04416666666666667
+    },
+    "honest": {
+     "loss_per_visit": 12.703,
+     "staff_s_per_visit": 64.48666666666666,
+     "strict_share": 0.45022222222222225,
+     "express_share": 0.11544444444444445
+    },
+    "opportunistic": {
+     "loss_per_visit": 14.64,
+     "staff_s_per_visit": 84.46388888888889,
+     "strict_share": 0.8305555555555556,
+     "express_share": 0.03722222222222222
+    }
+   }
+  },
+  {
+   "q": 0.1,
+   "strategy": "proofpay",
+   "visits": 15000,
+   "loss_total": 337327.0,
+   "loss_per_visit": 22.488466666666667,
+   "staff_minutes": 17994.416666666668,
+   "staff_s_per_visit": 71.97766666666666,
+   "customer_wait_s_per_visit": 76.97766666666666,
+   "honest_sent_to_strict": 0.2823333333333333,
+   "honest_express_share": 0.1807777777777778,
+   "unrefunded_wrong_charges": 18,
+   "fraud_cashout_loss": 155982.0,
+   "fraudsters_caught": "40/40",
+   "fraud_median_visits_to_catch": 0.0,
+   "by_archetype": {
+    "careless": {
+     "loss_per_visit": 14.810333333333332,
+     "staff_s_per_visit": 72.64833333333333,
+     "strict_share": 0.6033333333333334,
+     "express_share": 0.08733333333333333
+    },
+    "fraudster": {
+     "loss_per_visit": 132.01,
+     "staff_s_per_visit": 185.88333333333333,
+     "strict_share": 0.8275,
+     "express_share": 0.056666666666666664
+    },
+    "honest": {
+     "loss_per_visit": 12.039777777777777,
+     "staff_s_per_visit": 54.62388888888889,
+     "strict_share": 0.2823333333333333,
+     "express_share": 0.1807777777777778
+    },
+    "opportunistic": {
+     "loss_per_visit": 14.514444444444445,
+     "staff_s_per_visit": 81.69166666666666,
+     "strict_share": 0.7744444444444445,
+     "express_share": 0.04722222222222222
+    }
+   }
+  },
+  {
+   "q": 0.2,
+   "strategy": "proofpay",
+   "visits": 15000,
+   "loss_total": 339883.0,
+   "loss_per_visit": 22.65886666666667,
+   "staff_minutes": 15876.0,
+   "staff_s_per_visit": 63.504,
+   "customer_wait_s_per_visit": 68.504,
+   "honest_sent_to_strict": 0.1441111111111111,
+   "honest_express_share": 0.29055555555555557,
+   "unrefunded_wrong_charges": 21,
+   "fraud_cashout_loss": 163784.0,
+   "fraudsters_caught": "40/40",
+   "fraud_median_visits_to_catch": 0.0,
+   "by_archetype": {
+    "careless": {
+     "loss_per_visit": 15.241,
+     "staff_s_per_visit": 64.67833333333333,
+     "strict_share": 0.4696666666666667,
+     "express_share": 0.145
+    },
+    "fraudster": {
+     "loss_per_visit": 138.51166666666666,
+     "staff_s_per_visit": 182.59166666666667,
+     "strict_share": 0.785,
+     "express_share": 0.08333333333333333
+    },
+    "honest": {
+     "loss_per_visit": 11.371333333333334,
+     "staff_s_per_visit": 44.596666666666664,
+     "strict_share": 0.1441111111111111,
+     "express_share": 0.29055555555555557
+    },
+    "opportunistic": {
+     "loss_per_visit": 14.224444444444444,
+     "staff_s_per_visit": 76.69166666666666,
+     "strict_share": 0.6866666666666666,
+     "express_share": 0.075
+    }
+   }
+  },
+  {
+   "q": 0.35,
+   "strategy": "proofpay",
+   "visits": 15000,
+   "loss_total": 342432.0,
+   "loss_per_visit": 22.8288,
+   "staff_minutes": 14211.75,
+   "staff_s_per_visit": 56.847,
+   "customer_wait_s_per_visit": 61.847,
+   "honest_sent_to_strict": 0.07811111111111112,
+   "honest_express_share": 0.4043333333333333,
+   "unrefunded_wrong_charges": 25,
+   "fraud_cashout_loss": 171678.0,
+   "fraudsters_caught": "40/40",
+   "fraud_median_visits_to_catch": 0.0,
+   "by_archetype": {
+    "careless": {
+     "loss_per_visit": 15.616333333333333,
+     "staff_s_per_visit": 56.03,
+     "strict_share": 0.35333333333333333,
+     "express_share": 0.23566666666666666
+    },
+    "fraudster": {
+     "loss_per_visit": 145.015,
+     "staff_s_per_visit": 179.88333333333333,
+     "strict_share": 0.7483333333333333,
+     "express_share": 0.11333333333333333
+    },
+    "honest": {
+     "loss_per_visit": 10.690111111111111,
+     "staff_s_per_visit": 37.90555555555556,
+     "strict_share": 0.07811111111111112,
+     "express_share": 0.4043333333333333
+    },
+    "opportunistic": {
+     "loss_per_visit": 14.085555555555555,
+     "staff_s_per_visit": 70.89166666666667,
+     "strict_share": 0.5894444444444444,
+     "express_share": 0.11555555555555555
+    }
+   }
+  },
+  {
+   "q": 0.5,
+   "strategy": "proofpay",
+   "visits": 15000,
+   "loss_total": 341797.0,
+   "loss_per_visit": 22.786466666666666,
+   "staff_minutes": 13263.083333333334,
+   "staff_s_per_visit": 53.05233333333333,
+   "customer_wait_s_per_visit": 58.05233333333333,
+   "honest_sent_to_strict": 0.051333333333333335,
+   "honest_express_share": 0.4582222222222222,
+   "unrefunded_wrong_charges": 27,
+   "fraud_cashout_loss": 174867.0,
+   "fraudsters_caught": "40/40",
+   "fraud_median_visits_to_catch": 0.0,
+   "by_archetype": {
+    "careless": {
+     "loss_per_visit": 15.534333333333333,
+     "staff_s_per_visit": 50.346666666666664,
+     "strict_share": 0.276,
+     "express_share": 0.29333333333333333
+    },
+    "fraudster": {
+     "loss_per_visit": 147.51416666666665,
+     "staff_s_per_visit": 178.62916666666666,
+     "strict_share": 0.7283333333333334,
+     "express_share": 0.13
+    },
+    "honest": {
+     "loss_per_visit": 10.377333333333333,
+     "staff_s_per_visit": 34.54277777777778,
+     "strict_share": 0.051333333333333335,
+     "express_share": 0.4582222222222222
+    },
+    "opportunistic": {
+     "loss_per_visit": 13.767222222222221,
+     "staff_s_per_visit": 66.39166666666667,
+     "strict_share": 0.5127777777777778,
+     "express_share": 0.14555555555555555
+    }
+   }
+  }
+ ]
+}
