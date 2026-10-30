@@ -4,6 +4,8 @@
 
 At checkout, PayPal authorizes the whole basket. Computer vision decides which items actually left with the customer. Proofpay captures only the verified lines, releases the rest, and refunds upheld "Not mine" disputes. A trust score learned from each payer's history sets how much is held, how strict the exit check is, and when capture happens without a human. The same engine gives an AI shopping agent a spending limit that grows as its purchases turn out correct.
 
+**Live demo:** https://proofpay-6jk0.onrender.com (offline mode; Render's free plan sleeps when idle, so the first request can take about a minute).
+
 > Status (2026-10-30): everything runs end to end against an offline PayPal stand-in. The live sandbox run is pending sandbox credentials.
 
 ## Run it
@@ -64,7 +66,7 @@ Staff make every decision. Recommendations are stored with the staff decision, a
 
 **Currency.** INR isn't in PayPal's REST currency list. The store and the trust engine use rupees, and PayPal amounts are USD at a fixed demo rate (`DEMO_INR_PER_USD`, default 85).
 
-**Deploy.** `Dockerfile` builds the web export and serves it from FastAPI. `render.yaml` defines one Render web service. SQLite lives in `/tmp`, so demo data resets on redeploy.
+**Deploy.** `Dockerfile` builds the web export and serves it from FastAPI. `render.yaml` defines one Render web service on the free plan (deployed as a Blueprint from the public repo URL, so redeploys are manual). SQLite lives in `/tmp`, so demo data resets on redeploy or restart. To switch the hosted demo to the sandbox, set the `PAYPAL_*` keys and `PROOFPAY_PAYPAL=sandbox` in the service's environment.
 
 ## The one rule
 
