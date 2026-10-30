@@ -57,7 +57,8 @@ class ReplayEngine:
         out = []
         for f in sorted(self.folder.glob("*.json")):
             j = json.loads(f.read_text(encoding="utf-8"))
-            out.append({"scenario": f.stem, "title": j["title"], "customer_id": j["customer_id"]})
+            out.append({"scenario": f.stem, "title": j["title"], "customer_id": j["customer_id"],
+                        "hidden": j.get("hidden", [])})
         return out
 
     def basket(self, session_key: str) -> Trace:

@@ -4,7 +4,67 @@
 
 At checkout, PayPal authorizes the whole basket. Computer vision decides which items actually left with the customer. Proofpay captures only the verified lines, releases the rest, and refunds upheld "Not mine" disputes. A trust score learned from each payer's history sets how much is held, how strict the exit check is, and when capture happens without a human. The same engine gives an AI shopping agent a spending limit that grows as its purchases turn out correct.
 
-> Status (2026-10-30): the trust engine, unit tests and simulator are done. The PayPal sandbox flow, vision adapter, web app and agent client are next.
+> Status (2026-10-30): everything runs end to end against an offline PayPal stand-in. The live sandbox run is pending sandbox credentials.
+
+## Run it
+
+Offline mode runs with no PayPal keys, no model key and no GPU:
+
+```bash
+python -m venv .venv && .venv/Scripts/activate      # Windows; use bin/activate elsewhere
+pip install -e ".[dev]"
+cd web && npm ci && npm run build && cd ..
+uvicorn proofpay.api:app --port 8000                # open http://localhost:8000
+```
+
+The UI labels every stand-in:
+- **PayPal: offline stand-in** is `proofpay/paypal/fake.py`, an httpx transport that enforces the rules Proofpay relies on (amount = item total, capture ≤ authorization, refund ≤ capture, idempotent `PayPal-Request-Id`). It is not evidence of how the real sandbox behaves.
+- **AI: template** is a deterministic fallback used when no `GEMINI_API_KEY` is set.
+- **Vision: replay** replays recorded detection traces from `demo/scenarios/`.
+
+To use the real sandbox:
+1. Create a sandbox REST app plus buyer and merchant accounts at developer.paypal.com.
+2. Copy `.env.example` to `.env` and fill in the keys.
+3. Set `PROOFPAY_PAYPAL=sandbox`.
+4. For webhooks, subscribe to the events in [docs/verified-facts.md](docs/verified-facts.md) with URL `<host>/api/webhooks/paypal`, and set `PAYPAL_WEBHOOK_ID`.
+
+For development, run `npm run dev` in `web/` with `NEXT_PUBLIC_API_BASE=http://localhost:8000`.
+
+## Architecture
+
+```
+ shelf cameras ──► vision engine (replay traces; pluggable VisionEngine)
+                        │  line, p(taken), evidence
+                        ▼
+ Next.js (static) ──► FastAPI ──► trust engine (pure)  ◄── trust_events (SQLite)
+   checkout / staff /    │            policy + hold                ▲
+   trust / agent / sim   │                                         │
+                         ├──► PayPal Orders v2: create (AUTHORIZE), authorize
+                         ├──► PayPal Payments v2: capture verified, void, refund
+                         ├──◄ PayPal webhooks (signature-verified) ────────┘
+                         └──► Gemini: exit explainer, dispute triage, agent planner
+```
+
+**PayPal APIs used:**
+- Orders v2: `POST /v2/checkout/orders` with intent `AUTHORIZE`; `POST /v2/checkout/orders/{id}/authorize`.
+- Payments v2: `POST /v2/payments/authorizations/{id}/capture` (verified total, `final_capture`, unique `invoice_id`), `.../void`, `POST /v2/payments/captures/{id}/refund`.
+- `POST /v1/notifications/verify-webhook-signature`.
+- JS SDK v6 through `@paypal/react-paypal-js/sdk-v6`.
+- Every mutating call sends a deterministic `PayPal-Request-Id`, so a retry can't double-capture or double-refund.
+
+**AI components:**
+1. Vision probabilities decide what is billable.
+2. The exit-check explainer summarises evidence for staff.
+3. Dispute triage recommends on "Not mine" claims.
+4. The agent planner picks supplies from a catalog.
+
+Staff make every decision. Recommendations are stored with the staff decision, and `/api/ai/agreement` reports the agreement rate.
+
+**Agent client.** PayPal's [Agent Toolkit](https://github.com/paypal/agent-toolkit) exposes merchant-side tools (`create_order`, `get_order`, `pay_order`). The agent here buys, so it calls the same REST endpoints directly, and every payment passes `authorize_agent_spend` first.
+
+**Currency.** INR isn't in PayPal's REST currency list. The store and the trust engine use rupees, and PayPal amounts are USD at a fixed demo rate (`DEMO_INR_PER_USD`, default 85).
+
+**Deploy.** `Dockerfile` builds the web export and serves it from FastAPI. `render.yaml` defines one Render web service. SQLite lives in `/tmp`, so demo data resets on redeploy.
 
 ## The one rule
 
@@ -95,22 +155,34 @@ Results for seed 0 ([full table](docs/eval/results.md)):
 - Static rules have the least friction and the fewest false Strict visits, but nearly twice the loss.
 - "Fraudsters caught" is 40/40 for every strategy, because a cash-out basket trips the value-at-risk check. The useful number is cash-out loss.
 
+**Sensitivity to the concealment assumption.** The cost model assumes a dishonest shopper hides 30% of the basket. That assumption, together with a score that levels off near 0.88 under 90-day decay, makes Express rare for baskets above about ₹200. Across seeds 0 and 1, lowering the ratio keeps loss flat and cuts false Strict visits, at some cost in fraud loss:
+
+| Concealment ratio | Loss ₹/visit (seed 0 / 1) | Honest → Strict | Fraud cash-out loss (seed 0) |
+|---|---|---|---|
+| 0.30 (default) | 22.5 / 23.8 | 28% | 155,982 |
+| 0.20 | 22.5 / 23.6 | 15% | 160,594 |
+| 0.15 | 22.7 / 23.6 | 10% | 166,022 |
+| 0.10 | 22.7 / 23.5 | 5% | 171,585 |
+
+The default stays at 0.3 until it is chosen deliberately. It is a product decision, not something to tune for a nicer chart.
+
 ## Repository layout
 
 ```
-proofpay/trust/   trust engine (reputation, policy, config)
-proofpay/sim/     population simulator and baselines
-tests/            unit tests (pytest)
-docs/             verified PayPal/Devpost facts, eval outputs
+proofpay/trust/     trust engine (reputation, policy, config): pure, no I/O
+proofpay/sim/       population simulator and baselines
+proofpay/paypal/    REST client (sandbox only) and offline stand-in
+proofpay/checkout.py  authorize -> exit check -> capture / void / refund
+proofpay/agent.py   trust-gated purchasing agent
+proofpay/ai.py      exit explainer and dispute triage (Gemini, template fallback)
+proofpay/vision.py  VisionEngine interface and trace replay
+proofpay/api.py     FastAPI app; also serves web/out
+web/                Next.js app (static export), AG Grid tables
+demo/               detection traces and the agent's supply catalog
+docs/               verified PayPal/Devpost facts, eval outputs
 ```
 
-## Development
-
-```bash
-python -m venv .venv && .venv/Scripts/activate   # Windows; use bin/activate elsewhere
-pip install -e ".[dev]"
-pytest
-```
+Tests: `pytest` (trust engine, simulator, checkout against the stand-in, API).
 
 ## Licence
 

@@ -8,6 +8,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from proofpay.agent import AgentError, AgentService
@@ -16,7 +17,7 @@ from proofpay.checkout import BasketLine, CheckoutError, CheckoutService
 from proofpay.paypal import PayPalClient, PayPalError
 from proofpay.paypal.fake import FakePayPal
 from proofpay.store import Store
-from proofpay.trust import Event
+from proofpay.trust import Event, reputation
 from proofpay.vision import ReplayEngine, to_lines
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -230,6 +231,19 @@ def trust(subject: str):
     return svc.reputation(subject).explain()
 
 
+@app.get("/api/trust/{subject}/history")
+def trust_history(subject: str):
+    """Score just after each event, plus now: the trust inspector's line chart."""
+    evs = store.events(subject)
+    prior = svc.cohort_prior()
+    points = sorted({e.t for e in evs} | {svc.clock()})
+    out = []
+    for t in points:
+        r = reputation(subject, evs, t, prior)
+        out.append({"t": t, "score": r.score, "mean": r.mean, "lo": r.interval[0], "hi": r.interval[1]})
+    return out
+
+
 @app.get("/api/subjects")
 def subjects():
     out = []
@@ -313,3 +327,11 @@ async def paypal_webhook(request: Request):
         # webhooks when explicitly enabled (local demos and tests).
         raise HTTPException(403, "unverified webhooks are disabled")
     return {"result": svc.on_webhook(event)}
+
+
+# --- static: eval figures and the exported web app ------------------------------------
+
+if (ROOT / "docs" / "eval").exists():
+    app.mount("/eval", StaticFiles(directory=ROOT / "docs" / "eval"), name="eval")
+if (ROOT / "web" / "out").exists():
+    app.mount("/", StaticFiles(directory=ROOT / "web" / "out", html=True), name="web")

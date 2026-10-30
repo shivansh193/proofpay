@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: proofpay
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/config
+    envVars:
+      - key: PROOFPAY_PAYPAL
+        value: offline   # set to "sandbox" once PAYPAL_* keys are added
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

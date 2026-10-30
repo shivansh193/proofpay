@@ -38,11 +38,26 @@ Checked 2026-10-30. Each line names its source. "OPEN" means not yet confirmed; 
 `PAYMENT.AUTHORIZATION.CREATED`, `PAYMENT.AUTHORIZATION.VOIDED`, `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.REFUNDED`, `PAYMENT.CAPTURE.REVERSED`, `CUSTOMER.DISPUTE.CREATED|UPDATED|RESOLVED`, `CHECKOUT.ORDER.APPROVED`.
 OPEN: whether sandbox emits dispute events. If not, simulated disputes are labelled as simulated.
 
+## Currency
+
+- INR is **not** in PayPal's REST currency list (https://developer.paypal.com/api/rest/reference/currency-codes/). Store prices stay in INR (the trust engine is calibrated in rupees); sandbox amounts are USD at a fixed demo rate (`DEMO_INR_PER_USD`, default 85). This is a demo constant, not an exchange-rate quote.
+
+## Webhook verification
+
+- `POST /v1/notifications/verify-webhook-signature` with `auth_algo`, `cert_url`, `transmission_id`, `transmission_sig`, `transmission_time` (from the `PAYPAL-AUTH-ALGO`, `PAYPAL-CERT-URL`, `PAYPAL-TRANSMISSION-ID`, `PAYPAL-TRANSMISSION-SIG`, `PAYPAL-TRANSMISSION-TIME` headers), `webhook_id`, `webhook_event`. Response `verification_status`, sample `"SUCCESS"`. (https://developer.paypal.com/docs/api/webhooks/v1/verify-webhook-signature-post)
+- OPEN: dispute outcome codes. The code treats any `dispute_outcome.outcome_code` containing `BUYER` as a chargeback. Check against a real sandbox dispute.
+
 ## JS SDK
 
-- v6 is live (https://developer.paypal.com/community/blog/paypal-js-sdk-v6/). Uses `createPayPalOneTimePaymentSession`. The order (and its `intent`) is created server-side, so the client only passes an order id.
-- OPEN: confirm a v6 one-time session works with an `AUTHORIZE` order. Fall back to v5 `?intent=authorize` if not.
+- v6 is live (https://developer.paypal.com/community/blog/paypal-js-sdk-v6/). The web app uses `@paypal/react-paypal-js@10.6.1` from `/sdk-v6`: `PayPalProvider` (`environment="sandbox"`) and `PayPalOneTimePaymentButton` with `createOrder` returning `{ orderId }`. The order and its `AUTHORIZE` intent are created server-side.
+- OPEN: confirm in sandbox that the v6 button approves an `AUTHORIZE` order. Fall back to the v5 components in the same package if not.
 
-## Agent toolkit
+## Agent toolkit (https://github.com/paypal/agent-toolkit, Apache-2.0)
 
-- OPEN: official package names (`paypal-agent-toolkit` on PyPI, `@paypal/agent-toolkit` on npm, per third-party listings) and which actions work in sandbox. Check https://github.com/paypal/agent-toolkit before step 6.
+- Python package `paypal-agent-toolkit`. Payment tools: `create_order`, `get_order`, `pay_order` ("Process payment for an authorized order"), plus invoices, disputes, subscriptions, catalog and reporting. They are merchant-side, so the agent client calls the same REST endpoints directly behind the trust guard (the spec allows this).
+
+## Gemini
+
+- REST `POST https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`; text at `candidates[0].content.parts[].text`; JSON output via `generationConfig.responseMimeType` + `responseSchema`. (https://ai.google.dev/api/generate-content)
+- Stable Flash-tier ids listed 2026-10-30: `gemini-3.8-flash`, `gemini-3.6-flash`, `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`. (https://ai.google.dev/gemini-api/docs/models) Default `gemini-3.8-flash`, override with `GEMINI_MODEL`.
+- The key is sent in the `x-goog-api-key` header rather than the `?key=` query string the reference examples use. OPEN: confirm with a real key.
