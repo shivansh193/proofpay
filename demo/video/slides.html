@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Proofpay video slides</title>
+<style>
+  /* Palette from web/app/globals.css. Each <section> is screenshotted as one 1920x1080 slide. */
+  :root { --bg:#f6f7f9; --panel:#fff; --ink:#14171c; --muted:#5b6472; --line:#e2e5ea; --accent:#0b57d0;
+          --good:#137a3c; --good-bg:#e6f4ea; --warn:#8a5a00; --warn-bg:#fff4dc; --bad:#b3261e; --bad-bg:#fce8e6; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif; }
+  section { width: 1920px; height: 1080px; padding: 110px 140px; position: relative; display: flex; flex-direction: column; }
+  .mono { font-family: "Cascadia Mono", Consolas, monospace; }
+  .label { font: 600 26px/1 "Cascadia Mono", Consolas, monospace; color: var(--accent); letter-spacing: .04em; text-transform: uppercase; }
+  h1 { font-size: 76px; letter-spacing: -.02em; line-height: 1.1; margin-top: 18px; }
+  h2 { font-size: 34px; margin-bottom: 10px; }
+  p, li { font-size: 30px; line-height: 1.4; color: var(--muted); }
+  .grid { display: grid; gap: 28px; margin-top: 56px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 30px 34px; }
+  .card .label { font-size: 22px; margin-bottom: 14px; display: block; }
+  .card p { font-size: 28px; color: var(--ink); }
+  .card p + p { margin-top: 6px; color: var(--muted); }
+  .chip { display: inline-block; font-size: 24px; font-weight: 600; padding: 4px 16px; border-radius: 999px; }
+  .note { margin-top: auto; font-size: 26px; color: var(--muted); }
+  table { border-collapse: collapse; width: 100%; font-size: 30px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  th, td { padding: 18px 26px; text-align: right; border-bottom: 1px solid var(--line); }
+  th { font-size: 24px; color: var(--muted); font-weight: 600; }
+  th:first-child, td:first-child { text-align: left; }
+  tr.us td { font-weight: 700; }
+  td.weak { color: var(--bad); }
+</style>
+</head>
+<body>
+
+<section id="title" style="justify-content:center">
+  <div style="display:grid;grid-template-columns:auto auto;column-gap:36px;align-items:baseline;width:max-content">
+    <span style="font-size:48px;color:var(--muted);text-align:right">Held</span><span style="font-size:150px;font-weight:700;color:#9aa3ae;letter-spacing:-.04em">$4.10</span>
+    <span style="font-size:48px;color:var(--muted);text-align:right">Charged</span><span style="font-size:150px;font-weight:700;color:var(--accent);letter-spacing:-.04em">$3.57</span>
+  </div>
+  <h1 style="margin-top:70px">Proofpay</h1>
+  <p style="font-size:38px;margin-top:12px">Pay for what the camera proved, at the friction your history earned.</p>
+  <p class="note">A trust-scored, pay-on-verify checkout on PayPal, for camera-tracked stores and AI buying agents.</p>
+</section>
+
+<section id="glance">
+  <span class="label">At a glance</span>
+  <h1>Hold the basket. Capture only what was verified.</h1>
+  <div class="grid" style="grid-template-columns:repeat(4,1fr)">
+    <div class="card"><span class="label">1 · Vision</span><p>Each item gets a probability it was taken.</p><p>Billable only at p ≥ 0.90 or staff-confirmed.</p></div>
+    <div class="card"><span class="label">2 · Trust engine</span><p>Payer history picks Express, Standard or Strict.</p><p>By expected cost, explained line by line.</p></div>
+    <div class="card"><span class="label">3 · PayPal</span><p>Orders v2 authorize, Payments v2 capture / void / refund.</p><p>Webhooks feed the trust log.</p></div>
+    <div class="card"><span class="label">4 · AI</span><p>Gemini explains uncertain lines and triages “Not mine” claims.</p><p>Staff decide; agreement is logged.</p></div>
+  </div>
+  <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:28px">
+    <div class="card"><span class="label">Stack</span><p>FastAPI · SQLite · Next.js static export · AG Grid · Docker on Render</p></div>
+    <div class="card" style="border-color:#f0d9a8;background:var(--warn-bg)"><span class="label" style="color:var(--warn)">In this recording</span><p>PayPal runs on an offline stand-in with the same amount rules; AI on its template fallback. The live sandbox run is next.</p></div>
+  </div>
+</section>
+
+<section id="trust">
+  <span class="label">How trust works</span>
+  <h1>Trust changes friction. Never the charge.</h1>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="card"><span class="label">Reputation</span><p>Beta(α, β) per PayPal payer.</p><p>Verified captures add α; items found at exit, rejected disputes and chargebacks add β.</p></div>
+    <div class="card"><span class="label">Caution</span><p>Decisions use the 10th percentile, not the mean.</p><p>90-day decay; new payers start uncertain.</p></div>
+    <div class="card"><span class="label">Anti-gaming</span><p>Weekly cap on positive evidence.</p><p>Unusually large baskets can’t use Express.</p></div>
+    <div class="card"><span class="label">Policy</span><p>Cheapest expected cost: unchecked items + hidden items + wrong charges + staff and wait time.</p></div>
+    <div class="card"><span class="label">Strict hold</span><p>Basket + 15% authorized up front.</p><p>PayPal caps over-capture at 115% or USD 75.</p></div>
+    <div class="card"><span class="label">Agents</span><p>Limit ₹500 → ₹20,000 as score rises.</p><p>Up to 3× asks a human; above is denied.</p></div>
+  </div>
+</section>
+
+<section id="results">
+  <span class="label">Results · simulated, seed 0</span>
+  <h1 style="font-size:60px">500 shoppers × 30 visits, four behaviours, same world for every strategy</h1>
+  <table style="margin-top:44px">
+    <tr><th>Strategy</th><th>Loss ₹ / visit</th><th>Staff s / visit</th><th>Honest → Strict</th><th>Fraud cash-out loss ₹</th></tr>
+    <tr class="us"><td>Proofpay (10th percentile)</td><td>22.5</td><td class="weak">72.0</td><td class="weak">28.2%</td><td>155,982</td></tr>
+    <tr><td>Beta mean</td><td>22.9</td><td>56.4</td><td>7.1%</td><td>171,143</td></tr>
+    <tr><td>Static rules</td><td>42.1</td><td>49.0</td><td>0.6%</td><td>175,620</td></tr>
+    <tr><td>No trust (all Standard)</td><td>50.3</td><td>53.0</td><td>0.0%</td><td>581,583</td></tr>
+  </table>
+  <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:28px">
+    <div class="card"><span class="label" style="color:var(--good)">What holds up</span><p>Learned trust roughly halves loss vs static rules or no trust.</p></div>
+    <div class="card"><span class="label" style="color:var(--bad)">Where it’s worse</span><p>The lower bound sends 28% of honest visits to Strict for about the same loss as the plain mean. Vision error rates are assumptions, not measurements.</p></div>
+  </div>
+</section>
+
+<section id="outro" style="justify-content:center">
+  <h1 style="font-size:110px">Proofpay</h1>
+  <p style="font-size:38px;margin-top:14px">Pay for what the camera proved.</p>
+  <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:70px;width:1400px">
+    <div class="card"><span class="label">Code · Apache-2.0</span><p class="mono" style="font-size:30px">github.com/shivansh193/proofpay</p></div>
+    <div class="card"><span class="label">Live demo</span><p class="mono" style="font-size:30px">proofpay-6jk0.onrender.com</p></div>
+  </div>
+  <p class="note">Built for the PayPal AI Hackathon, 2026.</p>
+</section>
+
+</body>
+</html>

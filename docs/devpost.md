@@ -8,6 +8,10 @@ Paste each section into the matching Devpost field. Lines marked **[UPDATE]** ne
 
 Pay for what the camera proved, at the friction your history earned.
 
+## Status (early entry, 2026-11-05)
+
+This is an early submission for feedback; it will be updated before the deadline. What works today, end to end: the trust engine, simulator, checkout flow, AI explainer and dispute triage, agent guard and all five pages, deployed on Render. **The hosted demo runs against an offline PayPal stand-in** (labelled on every page) that enforces the same amount, capture and refund rules; the PayPal client is written against the sandbox REST API but has not yet been run against the live sandbox. AI runs on a labelled template fallback until a Gemini key is set. Both switch over with environment variables, and the sandbox run is the next step.
+
 ## Inspiration
 
 Cashierless stores make one of two bad choices. Either they trust everyone, and absorb the losses, or they check everyone, and rebuild the queue they set out to remove. The card hold underneath both choices is all-or-nothing: the store charges the whole basket and refunds later, or it doesn't hold at all.

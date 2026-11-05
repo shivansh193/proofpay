@@ -1,0 +1,124 @@
+{
+  "note": "One line per section. 'at' is seconds into out/proofpay-demo.mp4: slides are fixed (title 0, glance 6, trust 16, walkthrough 26, results 140.7, outro 152.7); walkthrough lines are 26 + the caption mark from out/marks.json. 'until' is when the next line starts. 'spoken' goes to TTS, 'written' to subtitles.",
+  "lines": [
+    {
+      "id": "title",
+      "at": 0.4,
+      "until": 6.2,
+      "spoken": "Card holds are all or nothing. Proofpay charges only for what the cameras proved.",
+      "written": "Card holds are all or nothing. Proofpay charges only for what the cameras proved."
+    },
+    {
+      "id": "glance",
+      "at": 6.3,
+      "until": 16.2,
+      "spoken": "PayPal holds the basket. Vision scores each item, a trust engine decides how much checking you need, and only verified lines get captured.",
+      "written": "PayPal holds the basket. Vision scores each item, a trust engine decides how much checking you need, and only verified lines get captured."
+    },
+    {
+      "id": "trust",
+      "at": 16.3,
+      "until": 26.6,
+      "spoken": "Trust comes only from your payment history, scored cautiously. It can change how much you're checked. Never what you're charged.",
+      "written": "Trust comes only from your payment history, scored cautiously. It can change how much you're checked. Never what you're charged."
+    },
+    {
+      "id": "first-visit",
+      "at": 26.9,
+      "until": 40.7,
+      "spoken": "Here's a first-time shopper. The camera is sure about the milk and bread, unsure about the chocolate, and saw the shampoo go back. With no history, she gets Strict.",
+      "written": "Here's a first-time shopper. The camera is sure about the milk and bread, unsure about the chocolate, and saw the shampoo go back. With no history, she gets Strict."
+    },
+    {
+      "id": "authorize",
+      "at": 40.8,
+      "until": 46.7,
+      "spoken": "The order is authorized. In this recording, PayPal is our offline stand-in.",
+      "written": "The order is authorized. In this recording, PayPal is our offline stand-in."
+    },
+    {
+      "id": "staff",
+      "at": 46.8,
+      "until": 55.85,
+      "spoken": "At the exit, the AI sums up the evidence for the one uncertain item. It only recommends. The staff member decides.",
+      "written": "At the exit, the AI sums up the evidence for the one uncertain item. It only recommends. The staff member decides."
+    },
+    {
+      "id": "capture",
+      "at": 55.95,
+      "until": 63.65,
+      "spoken": "Only three fifty-seven of the four ten is captured. Idempotency keys mean a retry can never charge twice.",
+      "written": "Only $3.57 of the $4.10 is captured. Idempotency keys mean a retry can never charge twice."
+    },
+    {
+      "id": "receipt",
+      "at": 63.75,
+      "until": 67.8,
+      "spoken": "The shampoo and the buffer are released, never charged.",
+      "written": "The shampoo and the buffer are released, never charged."
+    },
+    {
+      "id": "not-mine",
+      "at": 67.9,
+      "until": 79.2,
+      "spoken": "Later she says the bread wasn't hers. The AI compares her claim with the camera evidence, staff agree, and a partial refund goes out.",
+      "written": "Later she says the bread wasn't hers. The AI compares her claim with the camera evidence, staff agree, and a partial refund goes out."
+    },
+    {
+      "id": "history",
+      "at": 79.3,
+      "until": 92.25,
+      "spoken": "Fast forward twenty weekly visits, simulated and labelled as such. The score is a cautious lower bound, so trust is earned slowly.",
+      "written": "Fast forward 20 weekly visits, simulated and labelled as such. The score is a cautious lower bound, so trust is earned slowly."
+    },
+    {
+      "id": "express",
+      "at": 92.35,
+      "until": 106.25,
+      "spoken": "Same shopper, same kind of basket. Now she gets Express. Every item clears the auto-capture bar, so there's no exit check and no queue.",
+      "written": "Same shopper, same kind of basket. Now she gets Express. Every item clears the auto-capture bar, so there's no exit check and no queue."
+    },
+    {
+      "id": "agent",
+      "at": 106.35,
+      "until": 113.8,
+      "spoken": "The same engine gates AI shopping agents. This one plans a restock and asks to pay.",
+      "written": "The same engine gates AI shopping agents. This one plans a restock and asks to pay."
+    },
+    {
+      "id": "ask-human",
+      "at": 113.9,
+      "until": 123.4,
+      "spoken": "Fourteen hundred rupees is over its five hundred rupee limit, so it asks me first. Purchases that turn out right raise the limit.",
+      "written": "₹1,400 is over its ₹500 limit, so it asks me first. Purchases that turn out right raise the limit."
+    },
+    {
+      "id": "deny",
+      "at": 123.5,
+      "until": 129.8,
+      "spoken": "A forty-eight thousand rupee fridge is simply refused.",
+      "written": "A ₹48,000 fridge is simply refused."
+    },
+    {
+      "id": "simulator",
+      "at": 129.9,
+      "until": 140.8,
+      "spoken": "In simulation, five hundred shoppers over thirty visits each, learned trust roughly halves loss compared with static rules.",
+      "written": "In simulation, 500 shoppers over 30 visits each, learned trust roughly halves loss compared with static rules."
+    },
+    {
+      "id": "results",
+      "at": 140.9,
+      "until": 152.8,
+      "spoken": "The weak spot: our cautious score sends twenty-eight percent of honest visits to Strict, for about the same loss as a plain average.",
+      "written": "The weak spot: our cautious score sends 28% of honest visits to Strict, for about the same loss as a plain average."
+    },
+    {
+      "id": "outro",
+      "at": 153.0,
+      "until": 158.6,
+      "spoken": "Proofpay. Trust changes friction, never the charge.",
+      "written": "Proofpay. Trust changes friction, never the charge."
+    }
+  ]
+}

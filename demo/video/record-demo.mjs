@@ -4,7 +4,7 @@
 // Then narrate over out/demo.mp4. Captions are part of the frame; pass CAPTIONS=0 for a clean take.
 import { chromium } from "playwright";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readdirSync, renameSync, rmSync } from "node:fs";
+import { mkdirSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const BASE = process.env.BASE ?? "http://localhost:8001";
@@ -50,9 +50,13 @@ async function main() {
   });
   await ctx.addInitScript(OVERLAY);
   const page = await ctx.newPage();
+  // The video starts with the page; marks are seconds from here, one per caption change.
+  const t0 = Date.now();
+  const marks = [];
   let n = 0;
 
   const caption = async (text) => {
+    marks.push({ t: +((Date.now() - t0) / 1000).toFixed(2), caption: text });
     if (!CAPTIONS) text = "";
     await page.evaluate((t) => {
       sessionStorage.setItem("ppCaption", t);
@@ -112,7 +116,7 @@ async function main() {
   await sleep(3000);
   await shot("first-visit-policy");
 
-  await caption("PayPal authorizes the hold. Nothing is charged yet.");
+  await caption("Orders v2 authorize: the hold is placed, nothing is charged yet. (Offline PayPal stand-in in this recording.)");
   await click(btn("Approve with PayPal (offline stand-in)"), 1200);
   await page.getByText("Walk to the exit").waitFor();
   await sleep(2000);
@@ -130,7 +134,7 @@ async function main() {
   await caption("Close the visit: capture the verified lines, release the rest.");
   await click(btn("Close visit: capture verified, release the rest"), 1500);
   await page.getByText("captured", { exact: true }).first().waitFor();
-  await caption("PayPal captured $3.57 of the $4.10 held. Every call carries an idempotency key.");
+  await caption("Payments v2 capture takes $3.57 of the $4.10 held. Every call carries a PayPal-Request-Id.");
   await scrollTo(page.getByRole("heading", { name: "PayPal calls" }));
   await sleep(3500);
   await shot("paypal-calls");
@@ -150,7 +154,7 @@ async function main() {
   await page.locator(".ai", { hasText: "AI triage (" }).waitFor();
   await sleep(2500);
   await shot("not-mine-triage");
-  await caption("Staff confirms. PayPal issues a partial refund.");
+  await caption("Staff confirms, and a partial refund goes through the Payments v2 refund call.");
   await click(btn("Refund"), 1500);
   await page.getByText("Refunded", { exact: true }).first().waitFor();
   await sleep(2500);
@@ -221,6 +225,7 @@ async function main() {
   await caption("");
   await sleep(800);
 
+  writeFileSync(join(OUT, "marks.json"), JSON.stringify(marks, null, 2));
   const video = page.video();
   await ctx.close();
   await browser.close();
