@@ -97,7 +97,7 @@ python, fastapi, sqlite, scipy, numpy, matplotlib, httpx, next.js, react, typesc
 
 - Repo: https://github.com/shivansh193/proofpay (Apache-2.0)
 - Live demo: https://proofpay-6jk0.onrender.com
-- Video: **[UPDATE]** YouTube link
+- Video: https://youtu.be/z20VnFCW36M
 
 ## Notes for the submission form
 
