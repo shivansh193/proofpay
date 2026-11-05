@@ -1,6 +1,6 @@
 # To-do before the deadline
 
-Deadline: **Thu Nov 12, 2026, 12:00 PT** (Nov 13, 00:30 IST). The early entry is on Devpost; it stays editable until then.
+Deadline: **Thu Nov 12, 2026, 12:00 PT** (Nov 13, 01:30 IST; PST after Nov 1). The early entry is on Devpost; it stays editable until then.
 
 Prize rules that shape this list (from the Official Rules, checked 2026-11-05):
 - Sponsor prizes go to "all eligible submissions that use any <sponsor> tools". No further requirement is stated.

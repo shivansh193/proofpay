@@ -4,7 +4,7 @@ Checked 2026-10-30. Each line names its source. "OPEN" means not yet confirmed; 
 
 ## Hackathon (https://paypalaihackathon.devpost.com/rules)
 
-- Submission period ends **Thu Nov 12, 2026, 12:00 PM PT** (= Nov 13, 00:30 IST).
+- Submission period ends **Thu Nov 12, 2026, 12:00 PM PT** (= Nov 13, 01:30 IST, as Devpost shows; PST applies after Nov 1).
 - Judging Dec 1 to Dec 15, 2026; winners around Dec 21.
 - Must integrate the PayPal developer platform (sandbox) plus any AI tool. "Any AI tool works, as long as PayPal integration is central."
 - New or existing projects; existing ones "must have been significantly updated after the start of the Submission Period" and entrants "should explain how".
