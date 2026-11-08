@@ -24,14 +24,20 @@ Checked 2026-10-30. Each line names its source. "OPEN" means not yet confirmed; 
 - Honor period 3 days; authorization holds funds 29 days; each reauthorization creates a **new authorization ID** and restarts the honour period. (https://developer.paypal.com/docs/checkout/standard/customize/authorization/)
 - Multiple captures: `final_capture: false` on each non-final call, **unique `invoice_id` per capture**. Partial captures for PayPal payments **must be enabled on the PayPal account**. (https://developer.paypal.com/docs/integration/direct/payments/capture-payment/)
 - Over-capture: total captured must not exceed **115% of the authorization or USD 75 more, whichever is less**. (same guide) So a Strict "bigger hold" can't come from over-capture. It has to be authorized up front, e.g. a buffer line in the order.
-- OPEN: whether `final_capture: true` releases the uncaptured remainder automatically in v2. Legacy NVP docs say yes; v2 guides say void or let it expire. Test in sandbox at step 3 and record the result here.
-- OPEN: whether the sandbox merchant has partial/multiple capture enabled by default.
+- VERIFIED in sandbox 2026-11-08: after a $3.57 capture with `final_capture: true` on a $4.10 authorization, `GET /v2/payments/authorizations/{id}` returns `status: CAPTURED` (not `PARTIALLY_CAPTURED`). The authorization is closed and the remainder released; no void is needed.
+- VERIFIED in sandbox 2026-11-08: a partial capture ($3.57 of $4.10) succeeded on a fresh IN-region sandbox business account, so partial capture works by default there. Multiple captures (`final_capture: false`) not yet tested.
 
 ## Orders v2
 
 - `POST /v2/checkout/orders`, `POST /v2/checkout/orders/{id}/authorize`. (https://developer.paypal.com/docs/api/orders/v2/)
-- OPEN: exact response path to the authorization id (expected `purchase_units[0].payments.authorizations[0].id`) and presence of `payer.payer_id`. Confirm from a real sandbox response at step 3.
-- OPEN: whether `amount.value` must equal the breakdown sum (expected yes, else `AMOUNT_MISMATCH`).
+- VERIFIED in sandbox 2026-11-08: the authorize response has the authorization at `purchase_units[0].payments.authorizations[0].id` and the buyer at `payer.payer_id`; `authorizations[0].expiration_time` is 29 days out.
+- OPEN: whether `amount.value` must equal the breakdown sum (expected yes, else `AMOUNT_MISMATCH`). Orders where they match were accepted.
+
+## Sandbox findings (2026-11-08)
+
+- IN-region sandbox merchant, US sandbox buyer. The first approval (full login checkout, `/webapps/hermes`) went through: authorize, partial capture and a $0.65 partial refund all succeeded.
+- Later approvals by the same remembered buyer went through PayPal's newer `/pay/checkout` flow and were declined with "Transaction declined. To comply with international regulations, this transaction has been declined." This happened both with and without `payment_source.paypal.experience_context`. Likely cause: India's cross-border rules on the IN merchant account. Fix to try: a US-region sandbox business account for the app.
+- Void not yet tested against the sandbox.
 
 ## Webhooks (https://developer.paypal.com/api/rest/webhooks/event-names/)
 
@@ -50,7 +56,7 @@ OPEN: whether sandbox emits dispute events. If not, simulated disputes are label
 ## JS SDK
 
 - v6 is live (https://developer.paypal.com/community/blog/paypal-js-sdk-v6/). The web app uses `@paypal/react-paypal-js@10.6.1` from `/sdk-v6`: `PayPalProvider` (`environment="sandbox"`) and `PayPalOneTimePaymentButton` with `createOrder` returning `{ orderId }`. The order and its `AUTHORIZE` intent are created server-side.
-- OPEN: confirm in sandbox that the v6 button approves an `AUTHORIZE` order. Fall back to the v5 components in the same package if not.
+- PARTLY VERIFIED 2026-11-08: the v6 `PayPalOneTimePaymentButton` renders in sandbox with the server-created AUTHORIZE order (SDK v6.72.0). Approval inside the pop-up not yet clicked through; the same order was approved on PayPal's full-page checkout and then authorized.
 
 ## Agent toolkit (https://github.com/paypal/agent-toolkit, Apache-2.0)
 
