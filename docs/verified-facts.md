@@ -25,7 +25,9 @@ Checked 2026-10-30. Each line names its source. "OPEN" means not yet confirmed; 
 - Multiple captures: `final_capture: false` on each non-final call, **unique `invoice_id` per capture**. Partial captures for PayPal payments **must be enabled on the PayPal account**. (https://developer.paypal.com/docs/integration/direct/payments/capture-payment/)
 - Over-capture: total captured must not exceed **115% of the authorization or USD 75 more, whichever is less**. (same guide) So a Strict "bigger hold" can't come from over-capture. It has to be authorized up front, e.g. a buffer line in the order.
 - VERIFIED in sandbox 2026-11-08: after a $3.57 capture with `final_capture: true` on a $4.10 authorization, `GET /v2/payments/authorizations/{id}` returns `status: CAPTURED` (not `PARTIALLY_CAPTURED`). The authorization is closed and the remainder released; no void is needed.
-- VERIFIED in sandbox 2026-11-08: a partial capture ($3.57 of $4.10) succeeded on a fresh IN-region sandbox business account, so partial capture works by default there. Multiple captures (`final_capture: false`) not yet tested.
+- VERIFIED in sandbox 2026-11-08: a partial capture ($3.57 of $4.10) succeeded on a fresh IN-region sandbox business account, so partial capture works by default there.
+- VERIFIED in sandbox 2026-11-08 (US merchant): multiple captures work by default. On a $3.36 authorization, a $1.00 capture with `final_capture: false` left the authorization `PARTIALLY_CAPTURED`; a second $1.92 capture with `final_capture: true` (its own `invoice_id`) moved it to `CAPTURED`. A $0.80 partial refund on the second capture then completed.
+- VERIFIED in sandbox 2026-11-08: `POST /v2/payments/authorizations/{id}/void` returns the authorization with `status: VOIDED` and the full amount.
 
 ## Orders v2
 
@@ -37,7 +39,7 @@ Checked 2026-10-30. Each line names its source. "OPEN" means not yet confirmed; 
 
 - IN-region sandbox merchant, US sandbox buyer. The first approval (full login checkout, `/webapps/hermes`) went through: authorize, partial capture and a $0.65 partial refund all succeeded.
 - Later approvals by the same remembered buyer went through PayPal's newer `/pay/checkout` flow and were declined with "Transaction declined. To comply with international regulations, this transaction has been declined." This happened both with and without `payment_source.paypal.experience_context`. Likely cause: India's cross-border rules on the IN merchant account. Fix to try: a US-region sandbox business account for the app.
-- Void not yet tested against the sandbox.
+- Fixed: a new REST app linked to a US-region sandbox business account. With the same US buyer, a repeat approval through `/pay/checkout` was approved, not declined. Order 1 (approved through `/webapps/hermes`): authorize, two captures, partial refund. Order 2 (approved through `/pay/checkout`): authorize, void. Payee on both: the US sandbox merchant.
 
 ## Webhooks (https://developer.paypal.com/api/rest/webhooks/event-names/)
 

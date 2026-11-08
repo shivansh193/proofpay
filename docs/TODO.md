@@ -10,7 +10,8 @@ Prize rules that shape this list (from the Official Rules, checked 2026-11-05):
 ## 1. Must do (blocks a credible entry)
 
 - [ ] **PayPal sandbox run.** You: create the sandbox REST app plus buyer and merchant accounts, put the keys in `.env`. Then:
-  - [ ] run the real flow and close every OPEN item in `docs/verified-facts.md` (partial-capture enablement, `final_capture` remainder, authorize response paths and `payer_id`, the v6 button with AUTHORIZE, dispute webhooks);
+  - [x] run the real flow against a US sandbox merchant: authorize, partial and multiple captures, `final_capture` remainder, refund, void, repeat payments (2026-11-08, see `docs/verified-facts.md`);
+  - [ ] still open: the v6 button's pop-up approval end to end, dispute webhooks;
   - [ ] subscribe the webhook to the Render URL and set `PAYPAL_WEBHOOK_ID`;
   - [ ] set the keys and `PROOFPAY_PAYPAL=sandbox` on Render.
 - [ ] **Gemini key** (`GEMINI_API_KEY`) so the explainer, triage and agent planner run on the model instead of the template; confirm the model id and header in `docs/verified-facts.md`.
