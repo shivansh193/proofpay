@@ -40,6 +40,7 @@ Checked 2026-10-30. Each line names its source. "OPEN" means not yet confirmed; 
 - IN-region sandbox merchant, US sandbox buyer. The first approval (full login checkout, `/webapps/hermes`) went through: authorize, partial capture and a $0.65 partial refund all succeeded.
 - Later approvals by the same remembered buyer went through PayPal's newer `/pay/checkout` flow and were declined with "Transaction declined. To comply with international regulations, this transaction has been declined." This happened both with and without `payment_source.paypal.experience_context`. Likely cause: India's cross-border rules on the IN merchant account. Fix to try: a US-region sandbox business account for the app.
 - Fixed: a new REST app linked to a US-region sandbox business account. With the same US buyer, a repeat approval through `/pay/checkout` was approved, not declined. Order 1 (approved through `/webapps/hermes`): authorize, two captures, partial refund. Order 2 (approved through `/pay/checkout`): authorize, void. Payee on both: the US sandbox merchant.
+- VERIFIED on the live Render deploy 2026-11-09: a checkout visit created order `9R693460LT798932C` ($4.10 with the hold-buffer line); after buyer approval the app authorized it, and the staff exit (chocolate marked taken, shampoo released) captured $3.57 with `final_capture`. PayPal then reported the authorization `CAPTURED`. The approval itself was done on the full-page checkout, because the agent's browser blocks the button's pop-up.
 
 ## Webhooks (https://developer.paypal.com/api/rest/webhooks/event-names/)
 
