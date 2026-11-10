@@ -90,7 +90,7 @@ function Staff() {
               <span className={`chip ${s.status}`}>{s.status}</span>
               <span className="spacer" />
               {(s.status === "captured" || s.status === "voided") && (
-                <Link href={`/checkout/?s=${s.session_id}`}>Customer receipt</Link> · <Link href={`/evidence/?s=${s.session_id}`}>Handover evidence</Link>
+                <><Link href={`/checkout/?s=${s.session_id}`}>Customer receipt</Link> · <Link href={`/evidence/?s=${s.session_id}`}>Handover evidence</Link></>
               )}
               {s.status === "authorized" && toCheck.length > 0 && (
                 <button disabled={busy} onClick={() => run(async () => setRecs(await api<Rec[]>(`/api/sessions/${s.session_id}/explain`, {})))}>
