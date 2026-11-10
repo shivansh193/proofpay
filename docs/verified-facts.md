@@ -44,6 +44,11 @@ Checked 2026-10-30. Each line names its source. "OPEN" means not yet confirmed; 
 - Fixed: a new REST app linked to a US-region sandbox business account. With the same US buyer, a repeat approval through `/pay/checkout` was approved, not declined. Order 1 (approved through `/webapps/hermes`): authorize, two captures, partial refund. Order 2 (approved through `/pay/checkout`): authorize, void. Payee on both: the US sandbox merchant.
 - VERIFIED on the live Render deploy 2026-11-09: a checkout visit created order `9R693460LT798932C` ($4.10 with the hold-buffer line); after buyer approval the app authorized it, and the staff exit (chocolate marked taken, shampoo released) captured $3.57 with `final_capture`. PayPal then reported the authorization `CAPTURED`. The approval itself was done on the full-page checkout, because the agent's browser blocks the button's pop-up.
 
+## Channel3 (https://channel3.ai/docs/)
+
+- `POST https://api.trychannel3.com/v1/search` with header `x-api-key`; body `query`, `limit`, `filters.availability`. VERIFIED 2026-11-10: the response has `products[]` with `id`, `title`, `brands[].name`, `images[]` (`url`, `cleaned_url`, `is_main_image`) and `offers[]` (`url`, `domain`, `price.price`, `price.currency`, `availability`).
+- VERIFIED on the live deploy 2026-11-10: the agent planned "Buy ballpoint pens" from Channel3 ("Wow! Ballpoint Pens", $4.00 at fivebelow.com); the guard allowed it (₹340 within the ₹500 limit); PayPal sandbox order `08C41670RB076315U` was approved by the sandbox buyer and authorized (`0T667590YD2120248`, held); after "Delivered: capture" the authorization reads `CAPTURED` for $4.00.
+
 ## Webhooks (https://developer.paypal.com/api/rest/webhooks/event-names/)
 
 `PAYMENT.AUTHORIZATION.CREATED`, `PAYMENT.AUTHORIZATION.VOIDED`, `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.REFUNDED`, `PAYMENT.CAPTURE.REVERSED`, `CUSTOMER.DISPUTE.CREATED|UPDATED|RESOLVED`, `CHECKOUT.ORDER.APPROVED`.
