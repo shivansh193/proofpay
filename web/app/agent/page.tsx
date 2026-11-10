@@ -6,7 +6,7 @@ import { api, inr, type Trust } from "@/lib/api";
 
 type Purchase = {
   purchase_id: string;
-  items: { lines: { sku: string; name: string; price: number; qty: number }[]; task: string };
+  items: { lines: { sku: string; name: string; price: number; qty: number; price_usd?: number; retailer?: string; url?: string }[]; task: string };
   amount: number;
   verdict: "allow" | "ask_human" | "deny";
   status: string;
@@ -16,7 +16,8 @@ type Purchase = {
   capture_id: string | null;
 };
 type Status = { agent_id: string; limit: number; trust: Trust; purchases: Purchase[] };
-type Plan = { items: { sku: string; qty: number }[]; rationale: string; planner: string };
+type PlanItem = { sku: string; qty: number; name?: string; price_usd?: number; retailer?: string; url?: string; image?: string; brand?: string; query?: string };
+type Plan = { items: PlanItem[]; rationale: string; planner: string; catalog?: string };
 
 const AGENT = "restock-agent";
 
@@ -39,8 +40,10 @@ export default function AgentPage() {
     <>
       <h1>Agent console</h1>
       <p className="lede">
-        A purchasing agent buys supplies through PayPal. Witnessed gates every payment: within the limit it pays,
-        up to 3× the limit it asks you, above that it refuses. The limit grows only as the agent&apos;s purchases turn out right.
+        An AI shopping agent finds real products through Channel3 and buys them through PayPal. Witnessed gates every
+        payment: within the limit it goes ahead, up to 3× the limit it asks you, above that it refuses. Like the store exit,
+        PayPal only <b>holds</b> the money; it is captured when you confirm the delivery, and voided if you send it back.
+        The limit grows only as the agent&apos;s purchases turn out right.
       </p>
       {err && <div className="err">{err}</div>}
 
@@ -59,7 +62,19 @@ export default function AgentPage() {
           </div>
           {plan && (
             <div className="ai" style={{ marginTop: 10 }}>
-              <b>Plan ({plan.planner})</b>: {plan.items.map((i) => `${i.qty} × ${i.sku}`).join(", ")}<br />{plan.rationale}
+              <b>Plan</b> <span className="small muted">(planner: {plan.planner}; products: {plan.catalog ?? "demo catalog"})</span>
+              <ul className="small" style={{ margin: "6px 0" }}>
+                {plan.items.map((i) => (
+                  <li key={i.sku}>
+                    {i.image && <img src={i.image} alt="" width={36} height={36} style={{ objectFit: "contain", verticalAlign: "middle", marginRight: 6, background: "#fff", borderRadius: 4 }} />}
+                    {i.qty} × {i.name ?? i.sku}
+                    {i.price_usd != null && <> — ${i.price_usd.toFixed(2)} at {i.url ? <a href={i.url} target="_blank" rel="noreferrer">{i.retailer}</a> : i.retailer}</>}
+                    {i.query && <span className="muted"> (searched &ldquo;{i.query}&rdquo;)</span>}
+                  </li>
+                ))}
+              </ul>
+              {plan.rationale}
+              {plan.catalog === "channel3" && <div className="small muted">Prices are real Channel3 offers. The payment is a PayPal sandbox payment to Witnessed&apos;s test merchant; nothing is ordered from the retailer.</div>}
             </div>
           )}
           <h3 style={{ marginTop: 16 }}>Quick requests (for the demo)</h3>
@@ -92,7 +107,7 @@ export default function AgentPage() {
               {st?.purchases.map((p) => (
                 <tr key={p.purchase_id}>
                   <td>{p.items.lines.map((l) => `${l.qty} × ${l.name}`).join(", ")}</td>
-                  <td className="num">{inr(p.amount)}</td>
+                  <td className="num">{inr(p.amount)}{p.items.lines.some((l) => l.price_usd != null) && <div className="small muted">${p.items.lines.reduce((a, l) => a + (l.price_usd ?? 0) * l.qty, 0).toFixed(2)}</div>}</td>
                   <td><span className={`chip ${p.verdict}`}>{p.verdict.replace("_", " ")}</span></td>
                   <td><span className={`chip ${p.status}`}>{p.status.replace("_", " ")}</span>{p.outcome && <div className="small muted">{p.outcome}</div>}</td>
                   <td className="small">{p.reasons.join(". ")}</td>
@@ -104,12 +119,15 @@ export default function AgentPage() {
                       </div>
                     )}
                     {p.status === "awaiting_payer" && (
-                      <button disabled={busy} onClick={() => run(() => api(`/api/agents/purchases/${p.purchase_id}/complete`, {}))}>Payer approved: complete</button>
-                    )}
-                    {p.status === "paid" && !p.outcome && (
                       <div className="row">
-                        <button className="good" disabled={busy} onClick={() => run(() => api(`/api/agents/purchases/${p.purchase_id}/outcome`, { outcome: "ok" }))}>Correct</button>
-                        <button className="bad" disabled={busy} onClick={() => run(() => api(`/api/agents/purchases/${p.purchase_id}/outcome`, { outcome: "returned" }))}>Returned</button>
+                        {p.order_id && <a className="btn" href={`https://www.sandbox.paypal.com/checkoutnow?token=${p.order_id}`} target="_blank" rel="noreferrer">Approve in PayPal</a>}
+                        <button disabled={busy} onClick={() => run(() => api(`/api/agents/purchases/${p.purchase_id}/complete`, {}))}>Approved: place hold</button>
+                      </div>
+                    )}
+                    {(p.status === "held" || p.status === "paid") && !p.outcome && (
+                      <div className="row">
+                        <button className="good" disabled={busy} onClick={() => run(() => api(`/api/agents/purchases/${p.purchase_id}/outcome`, { outcome: "ok" }))}>{p.status === "held" ? "Delivered: capture" : "Correct"}</button>
+                        <button className="bad" disabled={busy} onClick={() => run(() => api(`/api/agents/purchases/${p.purchase_id}/outcome`, { outcome: "returned" }))}>{p.status === "held" ? "Sent back: void" : "Returned"}</button>
                       </div>
                     )}
                   </td>

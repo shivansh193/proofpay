@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 
 from proofpay.agent import AgentError, AgentService
 from proofpay.ai import Advisor
+from proofpay.catalog import Channel3
 from proofpay.checkout import BasketLine, CheckoutError, CheckoutService
 from proofpay.holds import HoldsService
 from proofpay.paypal import PayPalClient, PayPalError
@@ -54,7 +55,7 @@ sim_svc = svc if fake else CheckoutService(
     store, PayPalClient("offline", "offline", base_url="https://api-m.sandbox.paypal.com",
                         transport=sim_fake.transport()), inr_per_usd=INR_PER_USD, evidence_base=EVIDENCE_BASE)
 holds = HoldsService(store, svc, sim_svc, advisor)
-agents = AgentService(store, paypal, advisor, inr_per_usd=INR_PER_USD)
+agents = AgentService(store, paypal, advisor, inr_per_usd=INR_PER_USD, products=Channel3())
 vision = ReplayEngine()
 
 app = FastAPI(title="Witnessed", version="1.0.0", generate_unique_id_function=lambda route: route.name, description="Witnessed API: PayPal holds that capture only what the camera saw handed over.")
@@ -137,6 +138,7 @@ def config():
         "inr_per_usd": INR_PER_USD,
         "vision_engine": vision.name,
         "ai_backend": advisor.backend,
+        "catalog": agents.catalog_source,
     }
 
 

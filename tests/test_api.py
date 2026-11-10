@@ -9,6 +9,7 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setenv("PROOFPAY_PAYPAL", "offline")
     monkeypatch.setenv("PROOFPAY_DB", str(tmp_path / "t.db"))
     monkeypatch.setenv("GEMINI_API_KEY", "")
+    monkeypatch.setenv("CHANNEL3_API_KEY", "")
     monkeypatch.setenv("PROOFPAY_ALLOW_UNVERIFIED_WEBHOOKS", "1")
     import proofpay.api as api
 
@@ -89,11 +90,11 @@ def test_agent_limit_and_approval(client):
     plan = client.post("/api/agents/bot1/plan", json={"task": "weekly restock"}).json()
     assert plan["items"]
     small = client.post("/api/agents/bot1/purchases", json={"items": [{"sku": "SUP-RCPT-10", "qty": 1}]}).json()
-    assert small["verdict"] == "allow" and small["status"] == "paid"
+    assert small["verdict"] == "allow" and small["status"] == "held"
     mid = client.post("/api/agents/bot1/purchases", json={"items": [{"sku": "SUP-BULB-4", "qty": 1}]}).json()
     assert mid["verdict"] == "ask_human" and mid["status"] == "pending_approval"
     mid = client.post(f"/api/agents/purchases/{mid['purchase_id']}/decide", json={"approve": True}).json()
-    assert mid["status"] == "paid"
+    assert mid["status"] == "held"
     big = client.post("/api/agents/bot1/purchases", json={"items": [{"sku": "SUP-FRIDGE", "qty": 1}]}).json()
     assert big["verdict"] == "deny"
     for p in (small, mid):
@@ -144,3 +145,38 @@ def test_evidence_record(client):
     charged = [ln for ln in ev["lines"] if ln["charged"]]
     assert charged and all(ln["basis"] for ln in ev["lines"])
     assert any("put back" in ln["basis"] for ln in ev["lines"] if not ln["charged"])
+
+
+def test_agent_buys_channel3_products_hold_then_capture(tmp_path):
+    import json as _json
+
+    import httpx
+
+    from proofpay.agent import AgentService, task_to_searches
+    from proofpay.ai import Advisor
+    from proofpay.catalog import Channel3
+    from proofpay.paypal import PayPalClient
+    from proofpay.paypal.fake import FakePayPal
+    from proofpay.store import Store
+
+    assert task_to_searches("Restock bags, receipt rolls and cleaning supplies for next week.") == [
+        "bags", "receipt rolls", "cleaning supplies"]
+
+    def handler(req):
+        q = _json.loads(req.content)["query"]
+        prod = lambda pid, price: {"id": pid, "title": f"{q} {pid}", "brands": [{"name": "B"}], "images": [],
+                                   "offers": [{"url": f"https://buy.example/{pid}", "domain": "shop.example",
+                                               "price": {"price": price, "currency": "USD"}, "availability": "InStock"}]}
+        return httpx.Response(200, json={"products": [prod("a1", 9.39), prod("a2", 4.25)]})
+
+    fake = FakePayPal()
+    pp = PayPalClient("x", "y", base_url="https://api-m.sandbox.paypal.com", transport=fake.transport())
+    agents = AgentService(Store(tmp_path / "a.db"), pp, Advisor(api_key=""),
+                          products=Channel3("k", transport=httpx.MockTransport(handler)))
+    plan = agents.plan("Buy paper bags")
+    assert plan["catalog"] == "channel3" and plan["items"][0]["price_usd"] == 4.25  # cheapest offer
+    p = agents.request("bot", [{"sku": plan["items"][0]["sku"], "qty": 1}])
+    assert p["verdict"] == "allow" and p["status"] == "held"
+    assert fake.auths[p["authorization_id"]]["status"] == "CREATED"  # held, not charged
+    p = agents.outcome(p["purchase_id"], "ok")
+    assert p["status"] == "paid" and fake.auths[p["authorization_id"]]["status"] == "CAPTURED"

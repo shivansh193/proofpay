@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS agent_purchases (
     outcome TEXT,                      -- ok | returned | overridden
     reasons TEXT NOT NULL,
     order_id TEXT,
+    authorization_id TEXT,
     capture_id TEXT,
     created_t REAL NOT NULL
 );
@@ -107,6 +108,10 @@ class Store:
                 self.db.execute(f"ALTER TABLE sessions ADD COLUMN {col}")
             except sqlite3.OperationalError:
                 pass
+        try:
+            self.db.execute("ALTER TABLE agent_purchases ADD COLUMN authorization_id TEXT")
+        except sqlite3.OperationalError:
+            pass
 
     # --- customers ------------------------------------------------------------
 

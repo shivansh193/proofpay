@@ -72,6 +72,8 @@ For development, run `npm run dev` in `web/` with `NEXT_PUBLIC_API_BASE=http://l
 
 Staff make every decision. Recommendations are stored with the staff decision, and `/api/ai/agreement` reports the agreement rate.
 
+**Agent shopping with real products.** The agent turns a task into product searches (Gemini, or a template split without a key) and runs them against [Channel3](https://trychannel3.com)'s product search API (`POST /v1/search`), taking the cheapest in-stock USD offer for each. The purchase then goes through the trust guard and the same hold-then-capture flow as the store: PayPal authorizes the order, and Witnessed captures only when a person confirms the delivery, or voids the hold if it was sent back. Prices are real Channel3 offers; the payment is a PayPal sandbox payment to Witnessed's test merchant, and nothing is ordered from the retailer. Without `CHANNEL3_API_KEY` the agent falls back to `demo/catalog.json`.
+
 **Agent client.** PayPal's [Agent Toolkit](https://github.com/paypal/agent-toolkit) exposes merchant-side tools (`create_order`, `get_order`, `pay_order`). The agent here buys, so it calls the same REST endpoints directly, and every payment passes `authorize_agent_spend` first.
 
 **Currency.** INR isn't in PayPal's REST currency list. The store and the trust engine use rupees, and PayPal amounts are USD at a fixed demo rate (`DEMO_INR_PER_USD`, default 85).
@@ -230,7 +232,8 @@ proofpay/trust/     trust engine (reputation, policy, config): pure, no I/O
 proofpay/sim/       population simulator and baselines
 proofpay/paypal/    REST client (sandbox only) and offline stand-in
 proofpay/checkout.py  authorize -> exit check -> capture / void / refund
-proofpay/agent.py   trust-gated purchasing agent
+proofpay/agent.py   trust-gated purchasing agent (hold, capture on confirmed delivery)
+proofpay/catalog.py Channel3 product search for the agent
 proofpay/holds.py   authorization timeline rules and AI hold rescue
 sdk/                OpenAPI spec and APIMatic-generated Python/TypeScript SDKs
 proofpay/ai.py      exit explainer and dispute triage (Gemini, template fallback)
