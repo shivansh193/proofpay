@@ -111,3 +111,36 @@ def test_unverified_webhooks_off_by_default(client, monkeypatch):
     monkeypatch.delenv("PROOFPAY_ALLOW_UNVERIFIED_WEBHOOKS")
     r = client.post("/api/webhooks/paypal", json={"id": "x", "event_type": "y"})
     assert r.status_code == 403
+
+
+def test_holds_timeline_seed_and_rescue(client):
+    seeded = client.post("/api/demo/seed-holds").json()["seeded"]
+    assert len(seeded) == 5
+    assert client.post("/api/demo/seed-holds").json()["seeded"] == []  # idempotent
+    hs = {h["session_id"]: h for h in client.get("/api/holds").json()["holds"]}
+    assert all(hs[i]["simulated"] for i in seeded)
+    young, decided, past_honor, mid, old = (hs[i] for i in seeded)
+    assert young["risk"] == "low" and "reauthorize" not in young["allowed"]
+    assert "reauthorize" in past_honor["allowed"] and past_honor["risk"] == "high"
+    assert any(f.startswith("expires") for f in old["flags"])
+
+    # Undecided lines, past the honor period: the template reauthorizes (once).
+    r = client.post(f"/api/holds/{past_honor['session_id']}/rescue").json()
+    assert r["recommendation"]["action"] == "reauthorize"
+    assert r["hold"]["reauthorized_t"] and "reauthorize" not in r["hold"]["allowed"]
+    # Every line decided: capture the verified lines.
+    r = client.post(f"/api/holds/{decided['session_id']}/rescue").json()
+    assert r["recommendation"]["action"] == "capture_verified" and r["hold"]["status"] == "captured"
+    assert float(r["result"]["amount"]) > 0
+
+
+def test_evidence_record(client):
+    s = client.post("/api/sessions/from-scenario", json={"scenario": "01-first-visit"}).json()
+    sid = s["session_id"]
+    s = client.post(f"/api/sessions/{sid}/authorize").json()
+    client.post(f"/api/sessions/{sid}/exit", json={"staff_verdicts": staff_all(s)})
+    ev = client.get(f"/api/sessions/{sid}/evidence").json()
+    assert ev["record"] == "witnessed.handover-evidence/v1" and len(ev["sha256"]) == 64
+    charged = [ln for ln in ev["lines"] if ln["charged"]]
+    assert charged and all(ln["basis"] for ln in ev["lines"])
+    assert any("put back" in ln["basis"] for ln in ev["lines"] if not ln["charged"])

@@ -3,7 +3,7 @@ import "./globals.css";
 import { Nav } from "@/components/Nav";
 
 export const metadata: Metadata = {
-  title: "Proofpay",
+  title: "Witnessed",
   description: "Pay for what the camera proved, at the friction your history earned.",
 };
 

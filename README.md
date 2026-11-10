@@ -1,12 +1,22 @@
-# Proofpay
+# Witnessed
 
-**Pay for what the camera proved, at the friction your history earned.**
+**PayPal for in-person handovers: camera evidence becomes the tracking number that in-person sales never have.**
 
-At checkout, PayPal authorizes the whole basket. Computer vision decides which items actually left with the customer. Proofpay captures only the verified lines, releases the rest, and refunds upheld "Not mine" disputes. A trust score learned from each payer's history sets how much is held, how strict the exit check is, and when capture happens without a human. The same engine gives an AI shopping agent a spending limit that grows as its purchases turn out correct.
+A shipped order has a tracking number. PayPal's Seller Protection asks for one ("an online and verifiable tracking number") as proof of delivery. An item handed over in person has nothing comparable: for in-person delivery PayPal asks sellers for "alternative evidence of delivery" instead ([Seller Protection](https://www.paypal.com/us/legalhub/paypal/seller-protection), quoted in [docs/verified-facts.md](docs/verified-facts.md)).
 
-**Live demo:** https://proofpay-6jk0.onrender.com (offline mode; Render's free plan sleeps when idle, so the first request can take about a minute).
+Witnessed makes that evidence and ties the money to it:
 
-> Status (2026-10-30): everything runs end to end against an offline PayPal stand-in. The live sandbox run is pending sandbox credentials.
+1. **Hold.** The buyer approves a PayPal order with intent `AUTHORIZE` for the whole basket.
+2. **Witness.** Cameras give each item a probability that it was actually handed over. Only items at p ≥ 0.90, or confirmed by staff, can be charged.
+3. **Capture what was witnessed.** Witnessed captures only those lines and releases the rest. The capture's `note_to_payer` links to a **handover evidence record**: per item, the camera events, the decision and its basis, the PayPal IDs, and a SHA-256 of the record.
+4. **Keep holds alive.** The **Holds** timeline (Bryntum Scheduler) shows every open authorization against PayPal's honor period (3 days) and validity (29 days). For holds at risk, an AI picks reauthorize (allowed once, day 4–29), capture the verified lines, void, or wait, and Witnessed does it with PayPal.
+5. **"Not mine."** A buyer can dispute a line; AI triage reads the evidence and recommends; staff decide; an upheld claim becomes a partial PayPal refund.
+
+Supporting the above, a trust score learned from each payer's history sets how big the hold is and whether a human checks the handover. It never changes what is charged. The same engine gives an AI shopping agent a spending limit that grows as its purchases turn out correct.
+
+**Live demo:** https://proofpay-6jk0.onrender.com (PayPal sandbox; Render's free plan sleeps when idle, so the first request can take about a minute). The repository and service keep their original name, Proofpay; the product was renamed to Witnessed on 2026-11-10.
+
+**Is the evidence accepted by PayPal?** Untested. Witnessed produces the record and links it from the capture; no Seller Protection claim has been filed with it. In-person store sales qualify for Seller Protection only when paid by a PayPal goods-and-services QR code, which Witnessed does not use.
 
 ## Run it
 

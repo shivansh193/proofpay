@@ -4,11 +4,13 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/copy-bryntum.mjs && next dev",
+    "prebuild": "node scripts/copy-bryntum.mjs",
     "build": "next build",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@bryntum/scheduler": "npm:@bryntum/scheduler-trial@7.3.8",
     "@paypal/react-paypal-js": "10.6.1",
     "ag-grid-community": "36.2.0",
     "ag-grid-react": "36.2.0",

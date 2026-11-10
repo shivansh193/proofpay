@@ -78,6 +78,13 @@ class FakePayPal:
                     return _err(422, "AUTHORIZATION_ALREADY_CAPTURED")
                 a["status"] = "VOIDED"
                 return httpx.Response(204)
+            if parts[4] == "reauthorize":
+                if a["status"] != "CREATED":
+                    return _err(422, "AUTHORIZATION_ALREADY_CAPTURED")
+                nid = "AUTH-" + uuid.uuid4().hex[:10].upper()
+                self.auths[nid] = {**a, "id": nid, "amount": body.get("amount") or a["amount"], "captured": Decimal(0)}
+                a["status"] = "REAUTHORIZED"
+                return _ok({"id": nid, "status": "CREATED", "amount": self.auths[nid]["amount"]}, 201)
             if parts[4] == "capture":
                 if a["status"] not in ("CREATED", "PARTIALLY_CAPTURED"):
                     return _err(422, "AUTHORIZATION_ALREADY_CAPTURED")

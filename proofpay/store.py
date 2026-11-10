@@ -26,7 +26,10 @@ CREATE TABLE IF NOT EXISTS sessions (
     authorized_amount TEXT,            -- PayPal currency, as PayPal returned it
     capture_id TEXT,
     captured_amount TEXT,
-    created_t REAL NOT NULL
+    created_t REAL NOT NULL,
+    authorized_t REAL,                 -- when PayPal authorized (days since epoch)
+    reauthorized_t REAL,               -- set once: PayPal allows one reauthorization, day 4-29
+    simulated INTEGER NOT NULL DEFAULT 0  -- 1 = seeded demo hold on the offline stand-in
 );
 CREATE TABLE IF NOT EXISTS lines (
     session_id TEXT NOT NULL,
@@ -99,6 +102,11 @@ class Store:
         self.db = sqlite3.connect(str(path), check_same_thread=False)
         self.db.row_factory = sqlite3.Row
         self.db.executescript(SCHEMA)
+        for col in ("authorized_t REAL", "reauthorized_t REAL", "simulated INTEGER NOT NULL DEFAULT 0"):
+            try:  # databases created before these columns existed
+                self.db.execute(f"ALTER TABLE sessions ADD COLUMN {col}")
+            except sqlite3.OperationalError:
+                pass
 
     # --- customers ------------------------------------------------------------
 

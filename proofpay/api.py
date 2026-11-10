@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from proofpay.agent import AgentError, AgentService
 from proofpay.ai import Advisor
 from proofpay.checkout import BasketLine, CheckoutError, CheckoutService
+from proofpay.holds import HoldsService
 from proofpay.paypal import PayPalClient, PayPalError
 from proofpay.paypal.fake import FakePayPal
 from proofpay.store import Store
@@ -44,11 +45,19 @@ paypal = (
     else PayPalClient("offline", "offline", base_url="https://api-m.sandbox.paypal.com", transport=fake.transport())
 )
 advisor = Advisor()
-svc = CheckoutService(store, paypal, inr_per_usd=INR_PER_USD)
+EVIDENCE_BASE = os.environ.get("PUBLIC_BASE_URL", "https://proofpay-6jk0.onrender.com")
+svc = CheckoutService(store, paypal, inr_per_usd=INR_PER_USD, evidence_base=EVIDENCE_BASE)
+# Seeded demo holds always run on the offline stand-in (they need back-dated ages that
+# no real authorization can have), and are labelled simulated wherever they appear.
+sim_fake = fake or FakePayPal()
+sim_svc = svc if fake else CheckoutService(
+    store, PayPalClient("offline", "offline", base_url="https://api-m.sandbox.paypal.com",
+                        transport=sim_fake.transport()), inr_per_usd=INR_PER_USD, evidence_base=EVIDENCE_BASE)
+holds = HoldsService(store, svc, sim_svc, advisor)
 agents = AgentService(store, paypal, advisor, inr_per_usd=INR_PER_USD)
 vision = ReplayEngine()
 
-app = FastAPI(title="Proofpay")
+app = FastAPI(title="Witnessed", version="1.0.0", description="Witnessed API: PayPal holds that capture only what the camera saw handed over.")
 app.add_middleware(CORSMiddleware, allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:3000").split(","),
                    allow_methods=["*"], allow_headers=["*"])
 
@@ -268,6 +277,32 @@ def seed_history(body: SeedIn):
     return svc.reputation(payer).explain()
 
 
+# --- holds timeline and handover evidence -------------------------------------------
+
+
+@app.get("/api/sessions/{session_id}/evidence")
+def evidence(session_id: str):
+    return _guard(svc.evidence_record, session_id)
+
+
+@app.get("/api/holds")
+def list_holds():
+    return {"now_t": svc.clock(), "holds": holds.holds()}
+
+
+@app.post("/api/holds/{session_id}/rescue")
+def rescue_hold(session_id: str):
+    return _guard(holds.rescue, session_id)
+
+
+@app.post("/api/demo/seed-holds")
+def seed_holds():
+    """Add SIMULATED holds of different ages (offline stand-in) to the timeline."""
+    if any(s["simulated"] for s in store.sessions(limit=200)):
+        return {"seeded": [], "note": "already seeded"}
+    return {"seeded": holds.seed(vision, to_lines, sim_fake)}
+
+
 # --- agent ------------------------------------------------------------------------
 
 
@@ -327,6 +362,10 @@ async def paypal_webhook(request: Request):
         # webhooks when explicitly enabled (local demos and tests).
         raise HTTPException(403, "unverified webhooks are disabled")
     return {"result": svc.on_webhook(event)}
+
+
+if os.environ.get("SEED_DEMO_HOLDS") == "1":
+    seed_holds()  # the hosted demo's SQLite lives in /tmp and resets on restart
 
 
 # --- static: eval figures and the exported web app ------------------------------------

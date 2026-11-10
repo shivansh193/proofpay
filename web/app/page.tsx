@@ -3,35 +3,36 @@ import Link from "next/link";
 export default function Home() {
   return (
     <>
-      <h1>Pay for what the camera proved, at the friction your history earned.</h1>
+      <h1>PayPal for in-person handovers: camera evidence becomes the tracking number that in-person sales never have.</h1>
       <p className="lede">
-        PayPal authorizes the whole basket. Vision verifies which items actually left with the shopper. Proofpay captures only
-        the verified lines, releases the rest, and refunds upheld &ldquo;Not mine&rdquo; claims. A trust score learned from each
-        payer&apos;s history sets the hold, the strictness of the exit check, and when capture needs no human.
+        A shipped parcel has a tracking number. An item handed over at a counter, a pickup shelf or a cashierless store has
+        nothing. PayPal&apos;s Seller Protection asks in-person sellers for &ldquo;alternative evidence of delivery&rdquo;.
+        Witnessed makes that evidence. PayPal holds the basket, cameras record which items were actually handed over, and
+        Witnessed captures only those lines, releases the rest, and keeps a per-line evidence record next to each PayPal capture.
       </p>
       <div className="grid3">
         <div className="panel">
-          <h2>Trust changes friction, never charges</h2>
-          <p className="small muted">Only lines the camera is at least 90% sure of, or that staff confirmed, can be charged. Trust only decides whether a human needs to look.</p>
+          <h2>Evidence, then money</h2>
+          <p className="small muted">A line can be charged only if the camera is at least 90% sure it left with the buyer, or a staff member confirmed it. Each charged line keeps its timestamps and the decision behind it.</p>
         </div>
         <div className="panel">
-          <h2>Decision theory, not thresholds</h2>
-          <p className="small muted">Each basket gets the policy with the lowest expected cost: missed items, hidden items, wrong charges and everyone&apos;s time. The costs are on screen.</p>
+          <h2>Holds that don&apos;t lapse</h2>
+          <p className="small muted">The <Link href="/holds/">holds timeline</Link> tracks every PayPal authorization through its honor period and expiry. The AI reauthorizes or captures the verified lines before a hold is lost.</p>
         </div>
         <div className="panel">
-          <h2>One engine, two clients</h2>
-          <p className="small muted">The same trust engine gives an AI purchasing agent a spending limit that grows only as its purchases turn out right.</p>
+          <h2>Trust sets the friction</h2>
+          <p className="small muted">A reputation learned from each payer&apos;s history decides how big the hold is and whether a human checks the exit. It never changes what is charged.</p>
         </div>
       </div>
       <div className="panel">
         <h2>Demo path</h2>
         <ol className="small">
-          <li><Link href="/checkout/">Checkout</Link>: start &ldquo;First visit&rdquo;, approve with PayPal.</li>
-          <li><Link href="/staff/">Staff exit</Link>: ask the AI to explain the uncertain line, decide, close the visit. PayPal captures only verified lines.</li>
-          <li>Back on the receipt, tap &ldquo;Not mine&rdquo; on a line for a partial refund.</li>
-          <li><Link href="/trust/">Trust inspector</Link>: add simulated history for <code>asha</code>, then run &ldquo;Regular visit&rdquo;: Express, no queue.</li>
-          <li><Link href="/agent/">Agent</Link>: a small purchase pays, a bigger one asks you, a huge one is refused; mark purchases correct and watch the limit grow.</li>
-          <li><Link href="/sim/">Simulator</Link>: loss against friction for each strategy, including where Proofpay loses.</li>
+          <li><Link href="/checkout/">Checkout</Link>: start &ldquo;First visit&rdquo; and approve the hold with PayPal.</li>
+          <li><Link href="/staff/">Staff exit</Link>: ask the AI to explain the uncertain line, decide, and close the visit. PayPal captures only the verified lines.</li>
+          <li>On the receipt, open the evidence record, or tap &ldquo;Not mine&rdquo; on a line for a partial refund.</li>
+          <li><Link href="/holds/">Holds</Link>: open PayPal authorizations on a timeline; let the AI rescue the ones at risk.</li>
+          <li><Link href="/agent/">Agent</Link>: an AI shopping agent buys real products through the same hold-then-capture flow, inside a spending limit it earns.</li>
+          <li><Link href="/trust/">Trust inspector</Link> and <Link href="/sim/">Simulator</Link>: how the reputation works, and where it loses.</li>
         </ol>
       </div>
     </>

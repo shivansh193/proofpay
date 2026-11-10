@@ -6,7 +6,13 @@ services:
     healthCheckPath: /api/config
     envVars:
       - key: PROOFPAY_PAYPAL
-        value: offline   # set to "sandbox" once PAYPAL_* keys are added
+        value: sandbox
+      - key: PAYPAL_API_BASE
+        value: https://api-m.sandbox.paypal.com
+      - key: SEED_DEMO_HOLDS
+        value: "1"
+      - key: PUBLIC_BASE_URL
+        value: https://proofpay-6jk0.onrender.com
       - key: PAYPAL_CLIENT_ID
         sync: false
       - key: PAYPAL_CLIENT_SECRET

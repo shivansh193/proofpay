@@ -4,6 +4,7 @@
     python scripts/sandbox_smoke.py authorize ORDER_ID  # after the buyer approves in the browser
     python scripts/sandbox_smoke.py capture AUTH_ID AMOUNT [--final]
     python scripts/sandbox_smoke.py void AUTH_ID
+    python scripts/sandbox_smoke.py reauthorize AUTH_ID AMOUNT
     python scripts/sandbox_smoke.py refund CAPTURE_ID AMOUNT
     python scripts/sandbox_smoke.py get-auth AUTH_ID | get-order ORDER_ID
 Every response is saved to scripts/sandbox-responses/ (git-ignored) so docs/verified-facts.md can cite real shapes.
@@ -67,6 +68,13 @@ def main():
         j = pp.void_authorization(args[0], request_id=rid + "-void")
         print("void response:", j)
         print("saved", save("void", j))
+    elif cmd == "reauthorize":
+        try:
+            j = pp.reauthorize(args[0], float(args[1]), request_id=rid + "-reauth")
+        except Exception as e:  # keep PayPal's real error for docs/verified-facts.md
+            j = {"error": str(e), "body": getattr(e, "body", None), "status": getattr(e, "status", None)}
+        print("reauthorize:", j)
+        print("saved", save("reauthorize", j))
     elif cmd == "refund":
         j = pp.refund_capture(args[0], Decimal(args[1]), request_id=rid + "-refund")
         print("status:", j.get("status"), "| refund:", j.get("id"), "| amount:", j.get("amount"))

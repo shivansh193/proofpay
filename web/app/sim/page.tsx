@@ -16,7 +16,7 @@ type Row = {
 type Results = { seed: number; results: Row[]; quantile_sweep: Row[] };
 
 const LABEL: Record<string, string> = {
-  proofpay: "Proofpay (10th percentile)",
+  proofpay: "Witnessed (10th percentile)",
   beta_mean: "Beta mean",
   static_rules: "Static rules",
   no_trust: "No trust (all Standard)",
@@ -46,13 +46,13 @@ export default function Sim() {
             <div className="panel"><img className="fig" src={`${API}/eval/by_archetype.png`} alt="Loss and staff time per visit by shopper archetype" /></div>
           </div>
           <div className="panel scroll">
-            <h2>Where Proofpay is worse</h2>
+            <h2>Where Witnessed is worse</h2>
             <p className="small">
-              At the default 10th-percentile score, Proofpay sends more honest visits to Strict than the Beta mean, for almost
+              At the default 10th-percentile score, Witnessed sends more honest visits to Strict than the Beta mean, for almost
               the same loss. Loss is nearly flat across score quantiles while friction falls, so in this world the lower bound&apos;s
               caution mostly buys friction. Static rules have the least friction but nearly twice the loss.
             </p>
-            <Table rows={r.quantile_sweep} label={(x) => `Proofpay q = ${x.q}`} />
+            <Table rows={r.quantile_sweep} label={(x) => `Witnessed q = ${x.q}`} />
           </div>
         </>
       )}

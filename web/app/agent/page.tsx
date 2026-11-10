@@ -39,7 +39,7 @@ export default function AgentPage() {
     <>
       <h1>Agent console</h1>
       <p className="lede">
-        A purchasing agent buys supplies through PayPal. Proofpay gates every payment: within the limit it pays,
+        A purchasing agent buys supplies through PayPal. Witnessed gates every payment: within the limit it pays,
         up to 3× the limit it asks you, above that it refuses. The limit grows only as the agent&apos;s purchases turn out right.
       </p>
       {err && <div className="err">{err}</div>}

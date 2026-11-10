@@ -54,7 +54,7 @@ function Checkout() {
     <>
       <h1>Checkout</h1>
       <p className="lede">
-        The cameras tracked what the shopper picked up. PayPal authorizes the basket now. At the exit, Proofpay
+        The cameras tracked what the shopper picked up. PayPal authorizes the basket now. At the exit, Witnessed
         captures only what was verified and releases the rest.
       </p>
       {err && <div className="err">{err}</div>}
@@ -132,6 +132,9 @@ function Checkout() {
                 <dt>Released</dt><dd>${(Number(s.authorized_amount) - Number(s.captured_amount ?? 0)).toFixed(2)}</dd>
                 <dt>Refunded</dt><dd>${s.lines.filter((l) => l.refunded).reduce((a, l) => a + l.price_usd, 0).toFixed(2)}</dd>
               </dl>
+              <p className="small">
+                <Link href={`/evidence/?s=${s.session_id}`}>Handover evidence</Link>: what the camera saw for each item, and why it was or wasn&apos;t charged.
+              </p>
             </div>
           )}
 

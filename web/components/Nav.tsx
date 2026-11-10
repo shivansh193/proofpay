@@ -8,6 +8,7 @@ import { api, type Config } from "@/lib/api";
 const TABS = [
   ["/checkout/", "Checkout"],
   ["/staff/", "Staff exit"],
+  ["/holds/", "Holds"],
   ["/trust/", "Trust inspector"],
   ["/agent/", "Agent"],
   ["/sim/", "Simulator"],
@@ -21,7 +22,7 @@ export function Nav() {
   }, []);
   return (
     <nav className="nav">
-      <Link href="/" className="brand">Proofpay</Link>
+      <Link href="/" className="brand">Witnessed</Link>
       {TABS.map(([href, label]) => (
         <Link key={href} href={href} className={`tab ${path === href ? "on" : ""}`}>{label}</Link>
       ))}

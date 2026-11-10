@@ -7,6 +7,7 @@ fixed demo rate (`inr_per_usd`). That rate is a demo constant, not a quote.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 import uuid
@@ -53,8 +54,10 @@ class CheckoutService:
         cfg: TrustConfig = DEFAULT,
         clock: Callable[[], float] = days_now,
         inr_per_usd: float = 85.0,
+        evidence_base: str | None = None,
     ):
         self.store, self.paypal, self.cfg, self.clock, self.inr_per_usd = store, paypal, cfg, clock, inr_per_usd
+        self.evidence_base = evidence_base.rstrip("/") if evidence_base else None
 
     # --- trust ------------------------------------------------------------------
 
@@ -141,7 +144,8 @@ class CheckoutService:
         s = self._session(session_id, "created")
         rid = f"{session_id}-authorize"
         auth = self._paypal(session_id, "authorize_order", rid, self.paypal.authorize_order, s["order_id"], rid)
-        fields = {"status": "authorized", "authorization_id": auth.authorization_id, "authorized_amount": auth.amount}
+        fields = {"status": "authorized", "authorization_id": auth.authorization_id, "authorized_amount": auth.amount,
+                  "authorized_t": self.clock()}
         if auth.payer_id:
             self.store.link_payer(s["customer_id"], auth.payer_id)
             if s["subject"] != auth.payer_id:
@@ -201,8 +205,8 @@ class CheckoutService:
             rid = f"{session_id}-capture"
             cap = self._paypal(
                 session_id, "capture", rid, self.paypal.capture_authorization,
-                s["authorization_id"], total_usd, f"proofpay-{session_id}", rid, True,
-                "Charged only for items verified at checkout.",
+                s["authorization_id"], total_usd, f"witnessed-{session_id}", rid, True,
+                self.capture_note(session_id),
             )
             self.store.update_session(session_id, status="captured", capture_id=cap["id"],
                                       captured_amount=cap["amount"]["value"])
@@ -215,6 +219,44 @@ class CheckoutService:
             self.store.add_event(Event(s["subject"], "exit_mismatch", now, value=sum(f.price for f in found),
                                        meta={"session_id": session_id}))
         return self.view(session_id)
+
+    def capture_note(self, session_id: str) -> str:
+        """note_to_payer on the PayPal capture: where the handover evidence lives (<=255 chars)."""
+        if self.evidence_base:
+            return f"Charged only for items seen handed over. Evidence: {self.evidence_base}/evidence/?s={session_id}"
+        return "Charged only for items seen handed over."
+
+    def evidence_record(self, session_id: str) -> dict:
+        """The in-person equivalent of a tracking record: per line, what the camera saw,
+        who decided, and whether PayPal charged it. Hashed so a copy can be checked later."""
+        s = self.view(session_id)
+        lines = []
+        for ln in s["lines"]:
+            if ln["billed"]:
+                basis = "found at exit by staff" if ln["found_at_exit"] else (
+                    "staff confirmed" if ln["staff_verdict"] == 1 else f"camera p={ln['p']:.3f} >= 0.90")
+            else:
+                basis = "not charged: " + ("staff saw it not taken" if ln["staff_verdict"] == 0 else
+                                           "camera not sure enough" if ln["disposition"] != "release" else "put back")
+            lines.append({
+                "line_id": ln["line_id"], "item": ln["name"], "sku": ln["sku"],
+                "price_usd": ln["price_usd"], "camera_p_taken": ln["p"], "camera_events": ln["evidence"].get("events", []),
+                "camera_note": ln["evidence"].get("notes"), "charged": bool(ln["billed"]), "basis": basis,
+                "refunded": bool(ln["refunded"]),
+            })
+        body = {
+            "record": "witnessed.handover-evidence/v1",
+            "session_id": session_id,
+            "paypal": {"order_id": s["order_id"], "authorization_id": s["authorization_id"],
+                       "authorized": s["authorized_amount"], "capture_id": s["capture_id"],
+                       "captured": s["captured_amount"], "status": s["status"]},
+            "payer": s["subject"],
+            "policy": s["policy"],
+            "lines": lines,
+            "paypal_calls": [{k: c.get(k) for k in ("op", "request_id", "ok", "t")} for c in s["paypal_calls"]],
+        }
+        digest = hashlib.sha256(json.dumps(body, sort_keys=True, default=str).encode()).hexdigest()
+        return {**body, "sha256": digest}
 
     # --- 4. "Not mine" ------------------------------------------------------------
 
