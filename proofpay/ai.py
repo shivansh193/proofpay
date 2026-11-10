@@ -12,11 +12,12 @@ from __future__ import annotations
 
 import json
 import os
+import time
 
 import httpx
 
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-DEFAULT_MODEL = "gemini-3.8-flash"
+DEFAULT_MODEL = "gemini-3.5-flash"  # verified with a real key 2026-11-10; 3.8-flash timed out
 
 EXPLAIN_PROMPT = """You help a store employee at the exit of a camera-checkout shop.
 For each line below, the camera system was not sure whether the shopper took the item.
@@ -59,22 +60,23 @@ class Advisor:
     def __init__(self, api_key: str | None = None, model: str | None = None, transport: httpx.BaseTransport | None = None):
         self.api_key = api_key if api_key is not None else os.environ.get("GEMINI_API_KEY", "")
         self.model = model or os.environ.get("GEMINI_MODEL", DEFAULT_MODEL)
-        self._http = httpx.Client(timeout=30, transport=transport)
+        self._http = httpx.Client(timeout=60, transport=transport)
 
     @property
     def backend(self) -> str:
         return f"gemini:{self.model}" if self.api_key else "template"
 
     def _gemini(self, prompt: str, schema: dict):
-        r = self._http.post(
-            GEMINI_URL.format(model=self.model),
-            headers={"x-goog-api-key": self.api_key},
-            json={
-                "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-                "generationConfig": {"responseMimeType": "application/json", "responseSchema": schema,
-                                     "temperature": 0.2},
-            },
-        )
+        body = {
+            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "generationConfig": {"responseMimeType": "application/json", "responseSchema": schema, "temperature": 0.2},
+        }
+        for attempt in range(3):
+            r = self._http.post(GEMINI_URL.format(model=self.model), headers={"x-goog-api-key": self.api_key}, json=body)
+            # 503 "high demand" and 429 are transient (seen 2026-11-10); back off and retry.
+            if r.status_code not in (429, 500, 503) or attempt == 2:
+                break
+            time.sleep(1.5 * (attempt + 1))
         r.raise_for_status()
         text = "".join(p.get("text", "") for p in r.json()["candidates"][0]["content"]["parts"])
         return json.loads(text)

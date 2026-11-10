@@ -76,4 +76,4 @@ OPEN: whether sandbox emits dispute events. If not, simulated disputes are label
 
 - REST `POST https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`; text at `candidates[0].content.parts[].text`; JSON output via `generationConfig.responseMimeType` + `responseSchema`. (https://ai.google.dev/api/generate-content)
 - Stable Flash-tier ids listed 2026-10-30: `gemini-3.8-flash`, `gemini-3.6-flash`, `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`. (https://ai.google.dev/gemini-api/docs/models) Default `gemini-3.8-flash`, override with `GEMINI_MODEL`.
-- The key is sent in the `x-goog-api-key` header rather than the `?key=` query string the reference examples use. OPEN: confirm with a real key.
+- The key is sent in the `x-goog-api-key` header rather than the `?key=` query string the reference examples use. VERIFIED 2026-11-10 with a real key: `x-goog-api-key` plus `responseSchema` JSON output works on `gemini-3.5-flash` (now the default). `gemini-3.8-flash` did not answer within 60 s, and 3.5-flash intermittently returns 503 "high demand", so `_gemini` retries 429/500/503 twice with backoff.
