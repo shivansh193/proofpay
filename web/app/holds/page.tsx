@@ -91,7 +91,8 @@ export default function HoldsPage() {
         appendTo: host.current,
         startDate: new Date(now.getTime() - 30 * day),
         endDate: new Date(now.getTime() + 30 * day),
-        viewPreset: "weekAndDayLetter",
+        viewPreset: "weekAndMonth",
+        tickSize: 70,
         rowHeight: 46,
         barMargin: 8,
         readOnly: true,
@@ -154,7 +155,7 @@ export default function HoldsPage() {
           <span className="small muted">Green: honor period. Teal: renewed by a reauthorization. Orange: guarantee lapsed. Red: expiry. Simulated holds run on the offline stand-in, because no real authorization can be back-dated.</span>
           {!holds.some((h) => h.simulated) && <button onClick={seed}>Add simulated holds</button>}
         </div>
-        <div ref={host} style={{ height: Math.max(220, 70 + holds.length * 46) }} />
+        <div ref={host} style={{ height: Math.max(260, 110 + holds.length * 62) }} />
       </div>
       {err && <p className="error">{err}</p>}
       {last && (

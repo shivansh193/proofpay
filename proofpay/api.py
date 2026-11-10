@@ -57,7 +57,7 @@ holds = HoldsService(store, svc, sim_svc, advisor)
 agents = AgentService(store, paypal, advisor, inr_per_usd=INR_PER_USD)
 vision = ReplayEngine()
 
-app = FastAPI(title="Witnessed", version="1.0.0", description="Witnessed API: PayPal holds that capture only what the camera saw handed over.")
+app = FastAPI(title="Witnessed", version="1.0.0", generate_unique_id_function=lambda route: route.name, description="Witnessed API: PayPal holds that capture only what the camera saw handed over.")
 app.add_middleware(CORSMiddleware, allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:3000").split(","),
                    allow_methods=["*"], allow_headers=["*"])
 

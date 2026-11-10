@@ -9,7 +9,7 @@
     "/api/config": {
       "get": {
         "summary": "Config",
-        "operationId": "config_api_config_get",
+        "operationId": "config",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -25,7 +25,7 @@
     "/api/scenarios": {
       "get": {
         "summary": "Scenarios",
-        "operationId": "scenarios_api_scenarios_get",
+        "operationId": "scenarios",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -41,7 +41,7 @@
     "/api/sessions/from-scenario": {
       "post": {
         "summary": "Start From Scenario",
-        "operationId": "start_from_scenario_api_sessions_from_scenario_post",
+        "operationId": "start_from_scenario",
         "requestBody": {
           "content": {
             "application/json": {
@@ -77,7 +77,7 @@
     "/api/sessions": {
       "get": {
         "summary": "Sessions",
-        "operationId": "sessions_api_sessions_get",
+        "operationId": "sessions",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -91,7 +91,7 @@
       },
       "post": {
         "summary": "Start",
-        "operationId": "start_api_sessions_post",
+        "operationId": "start",
         "requestBody": {
           "content": {
             "application/json": {
@@ -127,7 +127,7 @@
     "/api/sessions/{session_id}": {
       "get": {
         "summary": "Session",
-        "operationId": "session_api_sessions__session_id__get",
+        "operationId": "session",
         "parameters": [
           {
             "name": "session_id",
@@ -164,7 +164,7 @@
     "/api/sessions/{session_id}/authorize": {
       "post": {
         "summary": "Authorize",
-        "operationId": "authorize_api_sessions__session_id__authorize_post",
+        "operationId": "authorize",
         "parameters": [
           {
             "name": "session_id",
@@ -201,7 +201,7 @@
     "/api/sessions/{session_id}/explain": {
       "post": {
         "summary": "Explain",
-        "operationId": "explain_api_sessions__session_id__explain_post",
+        "operationId": "explain",
         "parameters": [
           {
             "name": "session_id",
@@ -238,7 +238,7 @@
     "/api/sessions/{session_id}/exit": {
       "post": {
         "summary": "Exit Check",
-        "operationId": "exit_check_api_sessions__session_id__exit_post",
+        "operationId": "exit_check",
         "parameters": [
           {
             "name": "session_id",
@@ -285,7 +285,7 @@
     "/api/sessions/{session_id}/lines/{line_id}/triage": {
       "post": {
         "summary": "Triage",
-        "operationId": "triage_api_sessions__session_id__lines__line_id__triage_post",
+        "operationId": "triage",
         "parameters": [
           {
             "name": "session_id",
@@ -331,7 +331,7 @@
     "/api/sessions/{session_id}/lines/{line_id}/not-mine": {
       "post": {
         "summary": "Not Mine",
-        "operationId": "not_mine_api_sessions__session_id__lines__line_id__not_mine_post",
+        "operationId": "not_mine",
         "parameters": [
           {
             "name": "session_id",
@@ -388,7 +388,7 @@
       "get": {
         "summary": "Agreement",
         "description": "How often staff agreed with the AI. \"check_bag\" / \"review_footage\" defer to\nstaff, so they're counted separately rather than as agreement.",
-        "operationId": "agreement_api_ai_agreement_get",
+        "operationId": "agreement",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -404,7 +404,7 @@
     "/api/trust/{subject}": {
       "get": {
         "summary": "Trust",
-        "operationId": "trust_api_trust__subject__get",
+        "operationId": "trust",
         "parameters": [
           {
             "name": "subject",
@@ -442,7 +442,7 @@
       "get": {
         "summary": "Trust History",
         "description": "Score just after each event, plus now: the trust inspector's line chart.",
-        "operationId": "trust_history_api_trust__subject__history_get",
+        "operationId": "trust_history",
         "parameters": [
           {
             "name": "subject",
@@ -479,7 +479,7 @@
     "/api/subjects": {
       "get": {
         "summary": "Subjects",
-        "operationId": "subjects_api_subjects_get",
+        "operationId": "subjects",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -496,7 +496,7 @@
       "post": {
         "summary": "Seed History",
         "description": "Add SIMULATED weekly verified visits for a demo customer (labelled simulated).",
-        "operationId": "seed_history_api_demo_seed_history_post",
+        "operationId": "seed_history",
         "requestBody": {
           "content": {
             "application/json": {
@@ -532,7 +532,7 @@
     "/api/sessions/{session_id}/evidence": {
       "get": {
         "summary": "Evidence",
-        "operationId": "evidence_api_sessions__session_id__evidence_get",
+        "operationId": "evidence",
         "parameters": [
           {
             "name": "session_id",
@@ -569,7 +569,7 @@
     "/api/holds": {
       "get": {
         "summary": "List Holds",
-        "operationId": "list_holds_api_holds_get",
+        "operationId": "list_holds",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -585,7 +585,7 @@
     "/api/holds/{session_id}/rescue": {
       "post": {
         "summary": "Rescue Hold",
-        "operationId": "rescue_hold_api_holds__session_id__rescue_post",
+        "operationId": "rescue_hold",
         "parameters": [
           {
             "name": "session_id",
@@ -623,7 +623,7 @@
       "post": {
         "summary": "Seed Holds",
         "description": "Add SIMULATED holds of different ages (offline stand-in) to the timeline.",
-        "operationId": "seed_holds_api_demo_seed_holds_post",
+        "operationId": "seed_holds",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -639,7 +639,7 @@
     "/api/agents/{agent_id}": {
       "get": {
         "summary": "Agent Status",
-        "operationId": "agent_status_api_agents__agent_id__get",
+        "operationId": "agent_status",
         "parameters": [
           {
             "name": "agent_id",
@@ -676,7 +676,7 @@
     "/api/agents/{agent_id}/plan": {
       "post": {
         "summary": "Agent Plan",
-        "operationId": "agent_plan_api_agents__agent_id__plan_post",
+        "operationId": "agent_plan",
         "parameters": [
           {
             "name": "agent_id",
@@ -723,7 +723,7 @@
     "/api/agents/{agent_id}/purchases": {
       "post": {
         "summary": "Agent Purchase",
-        "operationId": "agent_purchase_api_agents__agent_id__purchases_post",
+        "operationId": "agent_purchase",
         "parameters": [
           {
             "name": "agent_id",
@@ -770,7 +770,7 @@
     "/api/agents/purchases/{purchase_id}/decide": {
       "post": {
         "summary": "Agent Decide",
-        "operationId": "agent_decide_api_agents_purchases__purchase_id__decide_post",
+        "operationId": "agent_decide",
         "parameters": [
           {
             "name": "purchase_id",
@@ -817,7 +817,7 @@
     "/api/agents/purchases/{purchase_id}/complete": {
       "post": {
         "summary": "Agent Complete",
-        "operationId": "agent_complete_api_agents_purchases__purchase_id__complete_post",
+        "operationId": "agent_complete",
         "parameters": [
           {
             "name": "purchase_id",
@@ -854,7 +854,7 @@
     "/api/agents/purchases/{purchase_id}/outcome": {
       "post": {
         "summary": "Agent Outcome",
-        "operationId": "agent_outcome_api_agents_purchases__purchase_id__outcome_post",
+        "operationId": "agent_outcome",
         "parameters": [
           {
             "name": "purchase_id",
@@ -901,7 +901,7 @@
     "/api/sim": {
       "get": {
         "summary": "Sim Results",
-        "operationId": "sim_results_api_sim_get",
+        "operationId": "sim_results",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -917,7 +917,7 @@
     "/api/webhooks/paypal": {
       "post": {
         "summary": "Paypal Webhook",
-        "operationId": "paypal_webhook_api_webhooks_paypal_post",
+        "operationId": "paypal_webhook",
         "responses": {
           "200": {
             "description": "Successful Response",

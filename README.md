@@ -30,7 +30,7 @@ uvicorn proofpay.api:app --port 8000                # open http://localhost:8000
 ```
 
 The UI labels every stand-in:
-- **PayPal: offline stand-in** is `proofpay/paypal/fake.py`, an httpx transport that enforces the rules Proofpay relies on (amount = item total, capture ≤ authorization, refund ≤ capture, idempotent `PayPal-Request-Id`). It is not evidence of how the real sandbox behaves.
+- **PayPal: offline stand-in** is `proofpay/paypal/fake.py`, an httpx transport that enforces the rules Witnessed relies on (amount = item total, capture ≤ authorization, refund ≤ capture, idempotent `PayPal-Request-Id`). It is not evidence of how the real sandbox behaves.
 - **AI: template** is a deterministic fallback used when no `GEMINI_API_KEY` is set.
 - **Vision: replay** replays recorded detection traces from `demo/scenarios/`.
 
@@ -77,6 +77,37 @@ Staff make every decision. Recommendations are stored with the staff decision, a
 **Currency.** INR isn't in PayPal's REST currency list. The store and the trust engine use rupees, and PayPal amounts are USD at a fixed demo rate (`DEMO_INR_PER_USD`, default 85).
 
 **Deploy.** `Dockerfile` builds the web export and serves it from FastAPI. `render.yaml` defines one Render web service on the free plan (deployed as a Blueprint from the public repo URL, so redeploys are manual). SQLite lives in `/tmp`, so demo data resets on redeploy or restart. To switch the hosted demo to the sandbox, set the `PAYPAL_*` keys and `PROOFPAY_PAYPAL=sandbox` in the service's environment.
+
+## Holds timeline (`proofpay/holds.py`, `web/app/holds/`)
+
+A PayPal authorization is not forever. Its funds are guaranteed for a 3-day honor period, it can be captured for 29 days, and it can be reauthorized from day 4 to day 29. The docs say "multiple re-authorizations"; the sandbox answered a same-day attempt with `REAUTHORIZATION_TOO_SOON`, "only allowed once from Day 4 to Day 29", so Witnessed allows one ([verified-facts](docs/verified-facts.md)).
+
+- The **Holds** page draws every authorization on a [Bryntum Scheduler](https://bryntum.com/products/scheduler/) timeline: one lane per order, with the honor period, a reauthorization's new honor period, the unguaranteed stretch and the day-29 expiry.
+- Each open hold gets a risk level and a list of **allowed** actions computed from those rules: `capture_verified`, `reauthorize`, `void`, `wait`.
+- "Ask AI to act" sends the hold's facts and the allowed list to the model (Gemini, or a labelled template without a key). An action outside the list is rejected. Witnessed then performs the choice with PayPal (`/v2/payments/authorizations/{id}/reauthorize`, `/capture` with only the verified lines, or `/void`) and records the decision and its reasoning.
+- No real authorization can be back-dated, so the hosted demo seeds five **simulated** holds (offline stand-in, labelled everywhere) at ages 0.4 to 26.8 days. Real sandbox holds created on the Checkout page appear beside them.
+
+Bryntum is a commercial library used here under its free trial (the npm `@bryntum/scheduler-trial` package). It is loaded as a prebuilt script from `web/public/bryntum/`, copied at build time by `web/scripts/copy-bryntum.mjs`, rather than bundled.
+
+## Handover evidence (`GET /api/sessions/{id}/evidence`, `web/app/evidence/`)
+
+For each visit: every item's camera probability and events, whether it was charged and on what basis (camera p ≥ 0.90, staff confirmed, found at exit, or why not), refunds, the PayPal order, authorization and capture IDs, the PayPal calls made, and a SHA-256 of the record. The capture's `note_to_payer` carries the record's URL, so the evidence travels with the PayPal transaction the way a tracking number does.
+
+## SDKs (`sdk/`, generated with APIMatic)
+
+`sdk/src/spec/openapi.json` is Witnessed's OpenAPI spec, exported from FastAPI. [APIMatic](https://www.apimatic.io/) generated typed clients from it:
+
+- [`sdk/python`](sdk/python/README.md) (`WitnessedClient`), with an [API reference](sdk/python/api-reference.md)
+- [`sdk/typescript`](sdk/typescript/README.md), with an [API reference](sdk/typescript/api-reference.md)
+
+```python
+from witnessed import WitnessedClient          # pip install ./sdk/python
+with WitnessedClient() as c:                   # defaults to the hosted demo
+    for h in c.list_holds()["holds"]:
+        print(h["customer_id"], h["risk"], h["allowed"])
+```
+
+To regenerate: `cd sdk && apimatic sdk generate -l python -d python -f` (and `-l typescript`). APIMatic's hosted docs portal needs a paid plan, so the SDKs' generated references are the docs.
 
 ## The one rule
 
@@ -152,7 +183,7 @@ Results for seed 0 ([full table](docs/eval/results.md)):
 
 | Strategy | Loss ₹/visit | Staff s/visit | Honest → Strict | Fraud cash-out loss ₹ |
 |---|---|---|---|---|
-| Proofpay (10th percentile) | **22.5** | 72.0 | 28.2% | **155,982** |
+| Witnessed (10th percentile) | **22.5** | 72.0 | 28.2% | **155,982** |
 | Beta mean | 22.9 | 56.4 | 7.1% | 171,143 |
 | Static rules | 42.1 | **49.0** | **0.6%** | 175,620 |
 | No trust (all Standard) | 50.3 | 53.0 | 0.0% | 581,583 |
@@ -161,7 +192,7 @@ Results for seed 0 ([full table](docs/eval/results.md)):
 - Any learned trust roughly halves loss compared with static rules or no trust.
 - It also cuts fraud cash-out loss to under a third of the no-trust level, because caught fraudsters move to Strict and stay there.
 
-**Where Proofpay is worse:**
+**Where Witnessed is worse:**
 - At the default 10th-percentile score, it sends 28% of honest visits to Strict and costs about 15 more staff-seconds per visit than the Beta mean, for almost the same loss.
 - The quantile sweep (grey line) shows loss is nearly flat across q = 0.02–0.5, while friction falls steadily. In this world the lower bound's caution mostly buys friction.
 - Static rules have the least friction and the fewest false Strict visits, but nearly twice the loss.
@@ -180,7 +211,7 @@ The default stays at 0.3 until it is chosen deliberately. It is a product decisi
 
 ## Built during the hackathon
 
-Proofpay is a new project. No code predates the submission period, and the history starts at `ed88ea0` (2026-10-30):
+Witnessed (first named Proofpay) is a new project. No code predates the submission period, and the history starts at `ed88ea0` (2026-10-30):
 
 | Commits | What |
 |---|---|
@@ -200,6 +231,8 @@ proofpay/sim/       population simulator and baselines
 proofpay/paypal/    REST client (sandbox only) and offline stand-in
 proofpay/checkout.py  authorize -> exit check -> capture / void / refund
 proofpay/agent.py   trust-gated purchasing agent
+proofpay/holds.py   authorization timeline rules and AI hold rescue
+sdk/                OpenAPI spec and APIMatic-generated Python/TypeScript SDKs
 proofpay/ai.py      exit explainer and dispute triage (Gemini, template fallback)
 proofpay/vision.py  VisionEngine interface and trace replay
 proofpay/api.py     FastAPI app; also serves web/out
